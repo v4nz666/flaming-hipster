@@ -15,8 +15,17 @@ class Display :
 
   def render(self, gui) :
     
-    for f in gui.frames:
-      f.render(libtcod.magenta, libtcod.white)
+    libtcod.console_clear(0)
+    for key in gui.frames:
+      gui.frames[key].renderFrame()
+    
+    for key in gui.frames:
+      gui.frames[key].renderTitle()
+
+    gui.updateMessages()
+    for key in gui.frames:
+      gui.frames[key].printMessages()
+    
     
     cells = gui.board.getCells()
     selected = gui.getSelected()

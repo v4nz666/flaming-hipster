@@ -14,14 +14,21 @@ class Gui :
     self.board = board
     
     #Our list of frames
-    self.frames = [
-      frame.Frame(0,0,board.width,board.height, 'Game Board'),
-      frame.Frame(board.width + 1,0, uiWidth, board.height / 3 - 1, 'Friends'),
-      frame.Frame(board.width + 1,board.height / 3, uiWidth, board.height / 3 - 1, 'Foes'),
-      frame.Frame(board.width + 1,2 * board.height / 3, uiWidth, board.height / 3, 'Info'),
-    ]
+    self.frames = {
+      'main': frame.Frame(0,0,board.width,board.height, 'Game Board'),
+      'friends': frame.Frame(board.width + 1,0, uiWidth, board.height / 3 - 1, 'Friends'),
+      'foes': frame.Frame(board.width + 1,board.height / 3, uiWidth, board.height / 3 - 1, 'Foes'),
+      'info': frame.Frame(board.width + 1,2 * board.height / 3, uiWidth, board.height / 3, 'Info'),
+    }
+    
+    for key in self.frames :
+      self.frames[key].setTextColor('white');
+      self.frames[key].setFrameColor('light_blue');
     
     return
+  
+  def updateMessages(self) :
+    self.frames['info'].addMessage("Position : "  + str(self.getSelected()), 2 )
   
   def selectionUp(self) :
     y = self.selectedY - 1;
