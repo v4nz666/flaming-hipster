@@ -9,10 +9,12 @@ import input as inp
 import board as board
 import gui as gui
 
-BOARD_WIDTH = 32
 BOARD_HEIGHT = 48
+BOARD_WIDTH = 64
 
-CONSOLE_WIDTH = 2 + (BOARD_WIDTH * 3)
+UI_WIDTH = 32
+
+CONSOLE_WIDTH = 3 + BOARD_WIDTH + UI_WIDTH
 CONSOLE_HEIGHT = 2 + BOARD_HEIGHT
 
 
@@ -23,7 +25,7 @@ Main
 
 '''
 _board = board.Board(BOARD_WIDTH, BOARD_HEIGHT)
-_gui = gui.Gui(_board)
+_gui = gui.Gui(_board, UI_WIDTH)
 
 disp = disp.Display(CONSOLE_WIDTH, CONSOLE_HEIGHT)
 
