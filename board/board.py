@@ -41,7 +41,6 @@ class Board :
       for x in range(self.width) :
         c = self._cells[x + y * self.width]
         alt = libtcod.heightmap_get_value(self._hm, c.x,c.y)
-        print "Setting altitude", alt
         c.alt = alt
         c.initColor()
         
