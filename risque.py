@@ -9,7 +9,7 @@ import input as inp
 import board as board
 import gui as gui
 
-BOARD_HEIGHT = 48
+BOARD_HEIGHT = 64
 BOARD_WIDTH = 96
 
 UI_WIDTH = 32
