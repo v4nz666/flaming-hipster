@@ -8,7 +8,8 @@ import frame as frame
 class Display :
 
   def __init__(self, width, height) :
-    libtcod.console_set_custom_font(b'terminal12x12_gs_ro.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
+    #libtcod.console_set_custom_font(b'terminal12x12_gs_ro.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
+    libtcod.console_set_custom_font(b'prestige10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_set_default_foreground(0, libtcod.white)
     libtcod.console_init_root(width, height, b'title', False, libtcod.RENDERER_GLSL)
     
@@ -33,9 +34,6 @@ class Display :
     
     # Draw each cell...
     for c in cells:
-      # 3 Horizontal screen poisitions, per cell
-      #for _x in range(3) :
-        
         # Our actual position on the screen, offset by 1 for the frame...
         y = 1 + c.y
         #x = 1 + (3 * c.x + _x)

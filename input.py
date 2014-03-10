@@ -22,5 +22,9 @@ def handleKeys(gui) :
   elif key.vk == libtcod.KEY_RIGHT:
     gui.selectionRgt()
   
+  elif key.c == ord('r') or key.c == ord('R'):
+    gui.board.resetMap()
+  
+  
   print gui.getSelected()
 

@@ -16,9 +16,7 @@ class Gui :
     #Our list of frames
     self.frames = {
       'main': frame.Frame(0,0,board.width,board.height, 'Game Board'),
-      'friends': frame.Frame(board.width + 1,0, uiWidth, board.height / 3 - 1, 'Friends'),
-      'foes': frame.Frame(board.width + 1,board.height / 3, uiWidth, board.height / 3 - 1, 'Foes'),
-      'info': frame.Frame(board.width + 1,2 * board.height / 3, uiWidth, board.height / 3, 'Info'),
+      'info': frame.Frame(board.width + 1,0, uiWidth, board.height, 'Info'),
     }
     
     for key in self.frames :
