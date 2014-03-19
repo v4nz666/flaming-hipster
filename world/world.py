@@ -1,12 +1,12 @@
 '''
-Board module
+World module
 
 '''
 import cell
 import random
 import libtcodpy as libtcod
 
-class Board :
+class World:
   
   width = None
   height = None

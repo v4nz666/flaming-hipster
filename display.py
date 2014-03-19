@@ -8,13 +8,12 @@ import frame as frame
 class Display :
 
   def __init__(self, width, height) :
-    #libtcod.console_set_custom_font(b'terminal12x12_gs_ro.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
     libtcod.console_set_custom_font(b'prestige10x10_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_set_default_foreground(0, libtcod.white)
     libtcod.console_init_root(width, height, b'title', False, libtcod.RENDERER_GLSL)
-    
 
   def render(self, gui) :
+    #TODO get a state passed in, and get contents of a console from it, to blit to the main console
     
     libtcod.console_clear(0)
     for key in gui.frames:
@@ -31,12 +30,10 @@ class Display :
     cells = gui.board.getCells()
     selected = gui.getSelected()
     
-    
     # Draw each cell...
     for c in cells:
         # Our actual position on the screen, offset by 1 for the frame...
         y = 1 + c.y
-        #x = 1 + (3 * c.x + _x)
         x = 1 + c.x
         libtcod.console_set_char_background(0, x, y, getattr(libtcod, c.color))
         

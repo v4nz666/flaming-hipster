@@ -28,5 +28,3 @@ class subState(state.State):
   def tick(self):
     key = libtcod.console_wait_for_keypress(True)
     return self.handleInput(key)
-  
-  

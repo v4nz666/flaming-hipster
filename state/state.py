@@ -3,8 +3,8 @@ State base class
 '''
 
 class State:
-  def __init__(self, name):
-    self.name = name
+  def __init__(self):
+    pass
   
   def initInputs(self, inputs):
     self.inputs = inputs

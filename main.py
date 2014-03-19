@@ -2,9 +2,14 @@ import sys
 import state
 import libtcodpy as libtcod
 
-
-
 menu = state.Menu('Menu')
+
+states = [menu]
+
+# Do this... so states know about all available states, and can pass them back from their tick() method
+for state in states :
+  state.registerStates(states)
+
 
 currentState = menu
   
