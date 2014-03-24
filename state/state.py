@@ -1,29 +1,12 @@
 '''
 State base class
 '''
+import input as input
 
 class State:
   def __init__(self):
-    pass
-  
-  def initInputs(self, inputs):
-    self.inputs = inputs
-    print "Inputs ", self.inputs
+    self.inputHandler = input.InputHandler()
   
   def tick(self):
-    print("Default tick handler, exiting")
+    print("Default tick handler")
     return False
-
-# For Blocking input, override with a similar method
-  #def tick(self):
-    #key = libtcod.console_wait_for_keypress(True)
-    #return self.handleInput(key)
-  
-  def handleInput(self,key):
-    for name in self.inputs:
-      print("Checking ", name)
-      cmd = self.inputs[name]
-      if ( cmd['key'] and cmd['key'] == key.vk ) or (
-        cmd['ch'] and ( ord(cmd['ch'].lower()) == key.c or ord(cmd['ch'].upper()) == key.c ) ):
-          return cmd['fn']()
-    return self

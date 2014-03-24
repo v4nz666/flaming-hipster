@@ -32,5 +32,8 @@ while not libtcod.console_is_window_closed() :
 
   disp.render(currentState._gui)
   currentState = currentState.tick()
+  
+  currentState.inputHandler.handleInput()
+  
   if currentState == False:
     sys.exit()

@@ -2,12 +2,17 @@ from state import State
 import libtcodpy as libtcod
 import world as world
 import gui as gui
+import input as input
+
 
 class GenerateWorld(State):
   def __init__(self, width, height):
     State.__init__(self)
     self.initWorld(width, height)
-    self.initInputs(
+    
+    self.inputHandler = input.BlockingKeyboardHandler()
+    
+    self.inputHandler.initInputs(
       {
         'quit': {
           'key':libtcod.KEY_ESCAPE,
@@ -42,6 +47,7 @@ class GenerateWorld(State):
       }
     )
   
+  
   def refresh(self) :
     self._world.resetMap()
   
@@ -53,14 +59,6 @@ class GenerateWorld(State):
     self._world = world.World(width, height)
     self._gui = gui.Gui(self._world, width)
   
-  
-  
-  
-  
   def tick(self) :
-    key = libtcod.console_wait_for_keypress(True)
-    if self.handleInput(key) == False:
-      return False
-    else:
-      return self
+    return self
   
