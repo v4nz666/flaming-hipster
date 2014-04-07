@@ -8,12 +8,14 @@ class Frame:
   
   x = y = 0
   w = h = 0
-  ch = '*'
+  ch = '#'
   
   colFrame = libtcod.white
   colText = libtcod.white
   
-  def __init__(self, x, y, w, h, name):
+  def __init__(self, console, x, y, w, h, name):
+    
+    self.console = console
     
     self.x = x
     self.y = y
@@ -37,8 +39,8 @@ class Frame:
         break
       x = 1 + self.x + k
       _y = self.y + y
-      libtcod.console_put_char(0, x, _y, c)
-      libtcod.console_set_char_foreground(0, x, _y, self.colText)
+      libtcod.console_put_char(self.console, x, _y, c)
+      libtcod.console_set_char_foreground(self.console, x, _y, self.colText)
     
   def setTextColor(self, col) :
     self.colText = getattr(libtcod, col)
@@ -54,11 +56,11 @@ class Frame:
       y1 = self.y
       y2 = self.y + self.h + 1
       
-      libtcod.console_put_char(0, x, y1, self.ch)
-      libtcod.console_put_char(0, x, y2, self.ch)
+      libtcod.console_put_char(self.console, x, y1, self.ch)
+      libtcod.console_put_char(self.console, x, y2, self.ch)
       
-      libtcod.console_set_char_foreground(0, x, y1, self.colFrame)
-      libtcod.console_set_char_foreground(0, x, y2, self.colFrame)
+      libtcod.console_set_char_foreground(self.console, x, y1, self.colFrame)
+      libtcod.console_set_char_foreground(self.console, x, y2, self.colFrame)
       
     for j in range (self.h + 2) :
       
@@ -66,11 +68,11 @@ class Frame:
       x1 = self.x
       x2 = self.x + self.w + 1
       
-      libtcod.console_put_char(0, x1, y, self.ch)
-      libtcod.console_put_char(0, x2, y, self.ch)
+      libtcod.console_put_char(self.console, x1, y, self.ch)
+      libtcod.console_put_char(self.console, x2, y, self.ch)
     
-      libtcod.console_set_char_foreground(0, x1, y, self.colFrame)
-      libtcod.console_set_char_foreground(0, x2, y, self.colFrame)
+      libtcod.console_set_char_foreground(self.console, x1, y, self.colFrame)
+      libtcod.console_set_char_foreground(self.console, x2, y, self.colFrame)
     
   def renderTitle(self) :
     

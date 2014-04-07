@@ -6,6 +6,6 @@ class InputHandler():
     self.inputs = inputs
     print "Inputs ", self.inputs
   
-  def handleInput(self, cmd):
+  def handleInput(self):
     print("Default input handler.")
     return

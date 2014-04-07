@@ -2,11 +2,25 @@
 State base class
 '''
 import input as input
+import libtcodpy as libtcod
+
 
 class State:
   def __init__(self):
     self.inputHandler = input.InputHandler()
+    self.reset()
+    
+    self.console = libtcod.console_new(0,0)
   
   def tick(self):
     print("Default tick handler")
-    return False
+    return self
+  
+  def registerStates(self, states) :
+    self._states = states
+  
+  def reset(self):
+    self.nextState = self
+  
+  def getConsole(self):
+      return self.console

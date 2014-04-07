@@ -9,7 +9,6 @@ class KeyboardHandler(InputHandler) :
     
   def handleKeyInput(self, key):
     for name in self.inputs:
-      print("Checking ", name)
       cmd = self.inputs[name]
       if ( cmd['key'] and cmd['key'] == key.vk ) or (
         cmd['ch'] and ( ord(cmd['ch'].lower()) == key.c or ord(cmd['ch'].upper()) == key.c ) ):

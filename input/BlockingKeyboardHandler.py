@@ -1,5 +1,5 @@
 import libtcodpy as libtcod
-from KeyboardHandler import  KeyboardHandler
+from KeyboardHandler import KeyboardHandler
 
 class BlockingKeyboardHandler(KeyboardHandler):
   def handleInput(self):

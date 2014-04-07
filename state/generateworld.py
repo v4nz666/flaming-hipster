@@ -6,10 +6,12 @@ import input as input
 
 
 class GenerateWorld(State):
-  def __init__(self, width, height):
+  def __init__(self, disp, width, height):
     State.__init__(self)
-    self.initWorld(width, height)
+    self.disp = disp
+    self.console = libtcod.console_new(disp.width, disp.height)
     
+    self.initWorld(width, height)
     self.inputHandler = input.BlockingKeyboardHandler()
     
     self.inputHandler.initInputs(
@@ -46,6 +48,7 @@ class GenerateWorld(State):
         }
       }
     )
+    self.update()
   
   
   def refresh(self) :
@@ -53,12 +56,39 @@ class GenerateWorld(State):
   
   def quit(self) :
     print("Quiting!")
-    return False
+    self.nextState = self._states['quit']
   
   def initWorld(self, width, height) :
     self._world = world.World(width, height)
-    self._gui = gui.Gui(self._world, width)
+    self._gui = gui.Gui(self.console, self._world, width)
   
-  def tick(self) :
+  def tick(self):
+    self.update()
     return self
+  
+  def update(self):
+    for key in self._gui.frames:
+      self._gui.frames[key].renderFrame()
+    
+    for key in self._gui.frames:
+      self._gui.frames[key].renderTitle()
+
+    self._gui.updateMessages()
+    for key in self._gui.frames:
+      self._gui.frames[key].printMessages()
+    
+    
+    cells = self._gui.board.getCells()
+    selected = self._gui.getSelected()
+    
+    # Draw each cell...
+    for c in cells:
+        # Our actual position on the screen, offset by 1 for the frame...
+        y = 1 + c.y
+        x = 1 + c.x
+        libtcod.console_set_char_background(self.console, x, y, getattr(libtcod, c.color))
+        
+        # If we're rendering the selected cell, add our selector's color
+        if selected[0] == c.x and selected[1] == c.y :
+          libtcod.console_set_char_background(self.console, x, y, libtcod.green, libtcod.BKGND_ADDALPHA(0.4))
   

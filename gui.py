@@ -8,15 +8,16 @@ class Gui :
   selectedX = 0;
   selectedY = 0;
   
-  def __init__(self, board, uiWidth) :
+  def __init__(self, console, board, uiWidth) :
+    self.console = console
     
     #Main game board
     self.board = board
     
     #Our list of frames
     self.frames = {
-      'main': frame.Frame(0,0,board.width,board.height, 'Game Board'),
-      'info': frame.Frame(board.width + 1,0, uiWidth, board.height, 'Info'),
+      'main': frame.Frame(self.console, 0,0,board.width,board.height, 'Game Board'),
+      'info': frame.Frame(self.console, board.width + 1,0, uiWidth, board.height, 'Info'),
     }
     
     for key in self.frames :
