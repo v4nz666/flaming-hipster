@@ -7,9 +7,7 @@ import input as input
 
 class GenerateWorld(State):
   def __init__(self, disp, width, height):
-    State.__init__(self)
-    self.disp = disp
-    self.console = libtcod.console_new(disp.width, disp.height)
+    State.__init__(self, disp)
     
     self.initWorld(width, height)
     self.inputHandler = input.BlockingKeyboardHandler()
@@ -19,7 +17,7 @@ class GenerateWorld(State):
         'quit': {
           'key':libtcod.KEY_ESCAPE,
           'ch': None,
-          'fn': self.quit
+          'fn': self.quitToMenu
         },
         'refresh': {
           'key': None,
@@ -54,7 +52,7 @@ class GenerateWorld(State):
   def refresh(self) :
     self._world.resetMap()
   
-  def quit(self) :
+  def quitToMenu(self) :
     print("Quiting!")
     self.nextState = self._states['quit']
   

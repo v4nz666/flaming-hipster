@@ -21,4 +21,3 @@ class Display :
     
   def clear(self):
     libtcod.console_clear(0)
-

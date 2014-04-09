@@ -6,8 +6,9 @@ quit State
 from state import State
 
 class Quit(State):
-  def __init__(self):
-    State.__init__(self)
+  #TODO optional parameter for disp? not used here...
+  def __init__(self, disp):
+    State.__init__(self,disp)
   
   def tick(self):
     print "Quiting"

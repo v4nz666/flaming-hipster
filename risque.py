@@ -22,7 +22,7 @@ disp = disp.Display(CONSOLE_WIDTH, CONSOLE_HEIGHT)
 s_Menu = state.Menu(disp)
 s_WorldGen = state.GenerateWorld(disp, WIN_MAIN_WIDTH, WIN_MAIN_HEIGHT)
 #s_Play = state.Play()
-s_Quit = state.Quit()
+s_Quit = state.Quit(disp)
 
 states = {
   'quit': s_Quit,

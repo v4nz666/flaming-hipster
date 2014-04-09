@@ -6,9 +6,7 @@ import libtcodpy as libtcod
 
 class Menu(State):
   def __init__(self, disp):
-    self.disp = disp
-    self.console = libtcod.console_new(disp.width, disp.height)
-  
-  def tick(self):
+    State.__init__(self, disp)
     
+  def tick(self):
     return self
