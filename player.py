@@ -19,7 +19,14 @@ class Player:
     self.torchColor = libtcod.lightest_flame#* libtcod.lightest_flame
   
   def update(self):
-    pass
+    try:
+      cellBelow = self.world.getCell(self.x, self.y + 1)
+      if cellBelow.passable:
+        self.mvDn()
+    except:
+      pass
+     
+      
   
   def render(self, console):
     if self.calculate_fov:

@@ -96,8 +96,8 @@ class Play(State):
     self.updateMessages()
     self._gui.render()
     #self._world.render(self.console)
-    self.player.update()
     self.player.render(self.console)
+    self.player.update()
     
 
   def initFovMap(self):
