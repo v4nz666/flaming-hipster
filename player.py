@@ -15,7 +15,7 @@ class Player:
     
     self.calculate_fov = True
     self.torchStrength = 6
-    self.torchColor = b'lightest_orange'
+    self.torchColor = libtcod.lightest_flame#* libtcod.lightest_flame
     
   def render(self, console):
     if self.calculate_fov:
@@ -34,21 +34,21 @@ class Player:
         
         if distance > 0:
           intensity = 1 - math.pow(distance / self.torchStrength, 2)
-          intensity = 1.0 / 3.0 + (2*intensity) / 3
+          intensity = 1.0 / 4.0 + (3*intensity) / 4
         print"dx, dy, d, d/tS, i:", (deltaX, deltaY, distance, distance / self.torchStrength, intensity)
         
         if c.passable:
-          color = getattr(libtcod, self.world.c_lightOpen) * getattr(libtcod, self.torchColor)
+          color = self.world.c_lightOpen * self.torchColor
         else:
-          color = getattr(libtcod, self.world.c_lightWall) * getattr(libtcod, self.torchColor)
+          color = self.world.c_lightWall * self.torchColor
       else:
         if not c.discovered:
-          color = getattr(libtcod, self.world.c_darkWall)
+          color = libtcod.black
         else:
           if c.passable:
-            color = getattr(libtcod, self.world.c_darkOpen) + libtcod.darker_grey
+            color = self.world.c_darkOpen# + libtcod.darker_grey
           else:
-            color = getattr(libtcod, self.world.c_darkWall) + libtcod.darkest_grey
+            color = self.world.c_darkWall
       libtcod.console_set_char_background(console, c.x+1, c.y+1, color, libtcod.BKGND_ALPHA(intensity))
 
     y = 1 + self.y

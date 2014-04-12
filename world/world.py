@@ -13,10 +13,10 @@ class World:
   
   _cells = None
   
-  c_lightWall = b'dark_grey'
-  c_darkWall = b'black'
-  c_lightOpen = b'lighter_grey'
-  c_darkOpen = b'black'
+  c_lightOpen = libtcod.lightest_grey
+  c_lightWall = libtcod.light_grey
+  c_darkOpen = libtcod.darkest_grey
+  c_darkWall = libtcod.darkest_grey * 0.5
   
   def __init__(self,w, h) :
     
