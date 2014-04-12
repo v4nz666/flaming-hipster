@@ -25,3 +25,7 @@ class State:
   
   def getConsole(self):
       return self.console
+  
+  def beforeTransition(self):
+    pass
+  

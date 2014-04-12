@@ -23,7 +23,11 @@ class Frame:
     self.h = h
     self.name = name
     
+    self.setTextColor('white');
+    self.setFrameColor('light_blue');
+    
     self.messages = [None for y in range(self.h)]
+    
     
   def addMessage(self, str, pos) :
     self.messages[pos] = str

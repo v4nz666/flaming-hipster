@@ -7,9 +7,12 @@ class Cell :
   def __init__(self,x, y) :
     self.x = x
     self.y = y
-    
+    self.reset()
+  
+  def reset(self):
+    self.color = b'black'
     self.passable = False
-    self.even = not ( x + y ) % 2
+    self.discovered = False
   
   def dig(self, passable) :
     self.passable = passable

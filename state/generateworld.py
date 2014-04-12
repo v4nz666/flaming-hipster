@@ -27,6 +27,11 @@ class GenerateWorld(State):
           'ch': None,
           'fn': self.quitToMenu
         },
+        'play': {
+          'key': None,
+          'ch': 'p',
+          'fn': self.proceed
+        },
         'refresh': {
           'key': None,
           'ch': 'r',
@@ -61,22 +66,12 @@ class GenerateWorld(State):
   def initGui(self) :
     self._gui = gui.Gui(self.console)
     
-    infoWidth = libtcod.console_get_width(self.console) - (2 + self._world.width),
-    infoHeight = libtcod.console_get_height(self.console),
+    infoWidth = libtcod.console_get_width(self.console) - (3 + self._world.width)
+    infoHeight = 10 #libtcod.console_get_height(self.console)
     
     #Our list of frames
-    self._gui.addFrame(0,0,self._world.width, self._world.height, 'Game Board')
-    self._gui.addFrame(self._world.width + 1,0,libtcod.console_get_width(self.console) - (3 + self._world.width),10,'Info')
-    
-    #self.frames = {
-    #  'main': gui.frame.Frame(self.console, 0,0,self._world.width, self._world.height, 'Game Board'),
-    #  'info': gui.frame.Frame(self.console,self._world.width + 1,0,libtcod.console_get_width(self.console) - (3 + self._world.width),10,'Info'),
-    #}
-    
-    frames = self._gui.getFrames()
-    for key in frames:
-      frames[key].setTextColor('white');
-      frames[key].setFrameColor('light_blue');
+    self._gui.addFrame(0,0,self._world.width, libtcod.console_get_height(self.console) - 2, 'Game Board')
+    self._gui.addFrame(self._world.width + 1,0,infoWidth,infoHeight,'Info')
       
     self.selectedX = 0;
     self.selectedY = 0;
@@ -96,17 +91,16 @@ class GenerateWorld(State):
     cells = self._world.getCells()
     
     selected = self.getSelected()
+    self._world.render(self.console);
     
-    # Draw each cell...
-    for c in cells:
-        # Our actual position on the screen, offset by 1 for the frame...
-        y = 1 + c.y
-        x = 1 + c.x
-        libtcod.console_set_char_background(self.console, x, y, getattr(libtcod, c.color))
-        
-        # If we're rendering the selected cell, add our selector's color
+    for c in self._world.getCells():
+      # If we're rendering the selected cell, add our selector's color
         if selected[0] == c.x and selected[1] == c.y :
+          x = c.x + 1
+          y = c.y + 1
+          
           libtcod.console_set_char_background(self.console, x, y, libtcod.green, libtcod.BKGND_ADDALPHA(0.4))
+
   
   def updateMessages(self) :
     self._gui.frames['Info'].addMessage("Position : "  + str(self.getSelected()), 2 )
@@ -138,7 +132,12 @@ class GenerateWorld(State):
     if x < self._world.width :
       self.selectedX = x
 
+
+  ### State transitions
   def quitToMenu(self) :
     print("Quiting!")
     self.nextState = self._states['quit']
-  
+  def proceed(self) :
+    print("Proceeding!")
+    self._states['play'].setWorld(self._world)
+    self.nextState = self._states['play']

@@ -9,8 +9,10 @@ import input as inp
 import sys
 import state
 
-WIN_MAIN_HEIGHT = 64
-WIN_MAIN_WIDTH = 96
+WIN_MAIN_WIDTH = 32
+WIN_MAIN_HEIGHT = 48
+#WIN_MAIN_HEIGHT = 64
+#WIN_MAIN_WIDTH = 96
 
 WIN_RIGHT_WIDTH = 32
 
@@ -21,14 +23,14 @@ disp = disp.Display(CONSOLE_WIDTH, CONSOLE_HEIGHT)
 
 s_Menu = state.Menu(disp)
 s_WorldGen = state.GenerateWorld(disp, WIN_MAIN_WIDTH, WIN_MAIN_HEIGHT)
-#s_Play = state.Play()
+s_Play = state.Play(disp)
 s_Quit = state.Quit(disp)
 
 states = {
   'quit': s_Quit,
   'menu': s_Menu,
   'generate': s_WorldGen,
-#  'game': s_Play
+  'play': s_Play
 }
 
 
@@ -50,5 +52,6 @@ while not libtcod.console_is_window_closed() :
   if newState != currentState:
     currentState.reset()
     currentState = newState
+    currentState.beforeTransition()
     disp.clear()
   
