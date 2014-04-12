@@ -5,50 +5,26 @@ GUI module
 import frame as frame
 
 class Gui :
-  selectedX = 0;
-  selectedY = 0;
   
-  def __init__(self, console, board, uiWidth) :
+  def __init__(self, console) :
     self.console = console
-    
-    #Main game board
-    self.board = board
-    
-    #Our list of frames
-    self.frames = {
-      'main': frame.Frame(self.console, 0,0,board.width,board.height, 'Game Board'),
-      'info': frame.Frame(self.console, board.width + 1,0, uiWidth, board.height, 'Info'),
-    }
-    
-    for key in self.frames :
-      self.frames[key].setTextColor('white');
-      self.frames[key].setFrameColor('light_blue');
+    self.frames = {}
     
     return
   
-  def updateMessages(self) :
-    self.frames['info'].addMessage("Position : "  + str(self.getSelected()), 2 )
+  def addFrame(self, x ,y, w, h, name) :
+    self.frames[name] = frame.Frame(self.console, x, y, w, h, name)
+    
   
-  def selectionUp(self) :
-    y = self.selectedY - 1;
-    if y >= 0 :
-      self.selectedY = y
-  
-  def selectionDn(self) :
-    y = self.selectedY + 1;
-    if y < self.board.height :
-      self.selectedY = y
-  
-  def selectionLft(self) :
-    x = self.selectedX - 1;
-    if x >= 0 :
-      self.selectedX = x
-  
-  def selectionRgt(self) :
-    x = self.selectedX + 1;
-    if x < self.board.width :
-      self.selectedX = x
+  def render(self):
+    for key in self.frames:
+      self.frames[key].renderFrame()
+    
+    for key in self.frames:
+      self.frames[key].renderTitle()
 
-
-  def getSelected(self) :
-    return (self.selectedX, self.selectedY)
+    for key in self.frames:
+      self.frames[key].printMessages()
+  
+  def getFrames(self) :
+    return self.frames

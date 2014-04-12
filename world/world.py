@@ -23,6 +23,7 @@ class World:
     
     self.initMap()
     self.resetMap()
+    
     return
   
   def initMap(self) :
@@ -30,7 +31,6 @@ class World:
     for y in range(self.height) :
       for x in range(self.width) :
         c = cell.Cell(x,y)
-        c.initColor()
         self._cells.append(c)
     return
   
@@ -39,11 +39,11 @@ class World:
     self.randomizeHeightmap()
     for y in range(self.height) :
       for x in range(self.width) :
-        c = self._cells[x + y * self.width]
-        alt = libtcod.heightmap_get_value(self._hm, c.x,c.y)
-        c.alt = alt
-        c.initColor()
-        
+        alt = libtcod.heightmap_get_value(self._hm, x, y)
+        self._cells[x + y * self.width].dig(alt > 1)
+    
+    
+    
     return
   
   #def getCell(self, x, y) :

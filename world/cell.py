@@ -8,13 +8,12 @@ class Cell :
     self.x = x
     self.y = y
     
-    self.alt = 0
     self.passable = False
     self.even = not ( x + y ) % 2
   
-  def initColor(self) :
-    if self.alt > 1 :
-      self.passable = True
+  def dig(self, passable) :
+    self.passable = passable
+    if  self.passable:
       self.color = b'grey'
     else :
       self.color = b'black'

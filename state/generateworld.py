@@ -10,8 +10,16 @@ class GenerateWorld(State):
     State.__init__(self, disp)
     
     self.initWorld(width, height)
-    self.inputHandler = input.BlockingKeyboardHandler()
+    self.initGui()
     
+    self.registerInputHandlers()
+    self.update()
+  
+  def refresh(self) :
+    self._world.resetMap()
+  
+  def registerInputHandlers(self) :
+    self.inputHandler = input.BlockingKeyboardHandler()
     self.inputHandler.initInputs(
       {
         'quit': {
@@ -27,57 +35,67 @@ class GenerateWorld(State):
         'selUp': {
           'key': libtcod.KEY_UP,
           'ch': None,
-          'fn': self._gui.selectionUp
+          'fn': self.selectionUp
         },
         'selDn': {
           'key': libtcod.KEY_DOWN,
           'ch': None,
-          'fn': self._gui.selectionDn
+          'fn': self.selectionDn
         },
         'selRgt': {
           'key': libtcod.KEY_LEFT,
           'ch': None,
-          'fn': self._gui.selectionLft
+          'fn': self.selectionLft
         },
         'selLft': {
           'key': libtcod.KEY_RIGHT,
           'ch': None,
-          'fn': self._gui.selectionRgt
+          'fn': self.selectionRgt
         }
       }
     )
-    self.update()
-  
-  
-  def refresh(self) :
-    self._world.resetMap()
-  
-  def quitToMenu(self) :
-    print("Quiting!")
-    self.nextState = self._states['quit']
   
   def initWorld(self, width, height) :
     self._world = world.World(width, height)
-    self._gui = gui.Gui(self.console, self._world, width)
+  
+  def initGui(self) :
+    self._gui = gui.Gui(self.console)
+    
+    infoWidth = libtcod.console_get_width(self.console) - (2 + self._world.width),
+    infoHeight = libtcod.console_get_height(self.console),
+    
+    #Our list of frames
+    self._gui.addFrame(0,0,self._world.width, self._world.height, 'Game Board')
+    self._gui.addFrame(self._world.width + 1,0,libtcod.console_get_width(self.console) - (3 + self._world.width),10,'Info')
+    
+    #self.frames = {
+    #  'main': gui.frame.Frame(self.console, 0,0,self._world.width, self._world.height, 'Game Board'),
+    #  'info': gui.frame.Frame(self.console,self._world.width + 1,0,libtcod.console_get_width(self.console) - (3 + self._world.width),10,'Info'),
+    #}
+    
+    frames = self._gui.getFrames()
+    for key in frames:
+      frames[key].setTextColor('white');
+      frames[key].setFrameColor('light_blue');
+      
+    self.selectedX = 0;
+    self.selectedY = 0;
+  
+  
   
   def tick(self):
     self.update()
     return self
   
   def update(self):
-    for key in self._gui.frames:
-      self._gui.frames[key].renderFrame()
     
-    for key in self._gui.frames:
-      self._gui.frames[key].renderTitle()
-
-    self._gui.updateMessages()
-    for key in self._gui.frames:
-      self._gui.frames[key].printMessages()
+    self.updateMessages()
+    self._gui.render()
     
+    #TODO Move this world-drawing bit somewhere it can be used by other states
+    cells = self._world.getCells()
     
-    cells = self._gui.board.getCells()
-    selected = self._gui.getSelected()
+    selected = self.getSelected()
     
     # Draw each cell...
     for c in cells:
@@ -89,4 +107,38 @@ class GenerateWorld(State):
         # If we're rendering the selected cell, add our selector's color
         if selected[0] == c.x and selected[1] == c.y :
           libtcod.console_set_char_background(self.console, x, y, libtcod.green, libtcod.BKGND_ADDALPHA(0.4))
+  
+  def updateMessages(self) :
+    self._gui.frames['Info'].addMessage("Position : "  + str(self.getSelected()), 2 )
+  
+  def getSelected(self) :
+    return (self.selectedX, self.selectedY)
+  
+  
+  ######################################
+  ### Key handlers
+  ######################################
+  def selectionUp(self) :
+    y = self.selectedY - 1;
+    if y >= 0 :
+      self.selectedY = y
+  
+  def selectionDn(self) :
+    y = self.selectedY + 1;
+    if y < self._world.height :
+      self.selectedY = y
+  
+  def selectionLft(self) :
+    x = self.selectedX - 1;
+    if x >= 0 :
+      self.selectedX = x
+  
+  def selectionRgt(self) :
+    x = self.selectedX + 1;
+    if x < self._world.width :
+      self.selectedX = x
+
+  def quitToMenu(self) :
+    print("Quiting!")
+    self.nextState = self._states['quit']
   
