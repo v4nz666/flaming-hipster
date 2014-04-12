@@ -20,25 +20,45 @@ class Play(State):
           'ch': None,
           'fn': self.quitToMenu
         },
-          'mvUp': {
-          'key': libtcod.KEY_UP,
+        'mvUp': {
+          'key': libtcod.KEY_KP8,
           'ch': None,
           'fn': self.mvUp
         },
         'mvDn': {
-          'key': libtcod.KEY_DOWN,
+          'key': libtcod.KEY_KP2,
           'ch': None,
           'fn': self.mvDn
         },
         'mvRgt': {
-          'key': libtcod.KEY_LEFT,
+          'key': libtcod.KEY_KP6,
+          'ch': None,
+          'fn': self.mvRgt
+        },
+        'mvLft': {
+          'key': libtcod.KEY_KP4,
           'ch': None,
           'fn': self.mvLft
         },
-        'mvLft': {
-          'key': libtcod.KEY_RIGHT,
+        'mvUpLft': {
+          'key': libtcod.KEY_KP7,
           'ch': None,
-          'fn': self.mvRgt
+          'fn': self.mvUpLft
+        },
+        'mvUpRgt': {
+          'key': libtcod.KEY_KP9,
+          'ch': None,
+          'fn': self.mvUpRgt
+        },
+        'mvDnLft': {
+          'key': libtcod.KEY_KP1,
+          'ch': None,
+          'fn': self.mvDnLft
+        },
+        'mvDnRgt': {
+          'key': libtcod.KEY_KP3,
+          'ch': None,
+          'fn': self.mvDnRgt
         }
     }
     )
@@ -76,6 +96,7 @@ class Play(State):
     self.updateMessages()
     self._gui.render()
     #self._world.render(self.console)
+    self.player.update()
     self.player.render(self.console)
     
 
@@ -96,33 +117,58 @@ class Play(State):
     y = self.player.y - 1;
     cell = self._world.getCell(self.player.x, y)
     if y >= 0 and cell.passable:
-      self.player.y = y
+      self.player.mvUp()
   
   def mvDn(self) :
+    print "Down"
     y = self.player.y + 1;
     cell = self._world.getCell(self.player.x, y)
     if y < self._world.height and cell.passable:
-      self.player.y = y
+      self.player.mvDn()
   
   def mvLft(self) :
     x = self.player.x - 1;
     cell = self._world.getCell(x, self.player.y)
     if x >= 0 and cell.passable:
-      self.player.x = x
+      self.player.mvLt()
   
   def mvRgt(self) :
     x = self.player.x + 1;
     cell = self._world.getCell(x, self.player.y)
     if x < self._world.width and cell.passable:
-      self.player.x = x
+      self.player.mvRt()
 
-
-
-
-
-
-
-
+  def mvUpLft(self) :
+    y = self.player.y - 1
+    x = self.player.x - 1
+    cell = self._world.getCell(x, y)
+    if y >= 0 and cell.passable:
+      self.player.mvUpLft()
+  
+  def mvUpRgt(self) :
+    y = self.player.y - 1
+    x = self.player.x + 1
+    cell = self._world.getCell(x, y)
+    if y >= 0 and cell.passable:
+      self.player.mvUpRgt()
+  
+  def mvDnLft(self) :
+    y = self.player.y + 1
+    x = self.player.x - 1
+    cell = self._world.getCell(x, y)
+    if y < self._world.height and cell.passable:
+      self.player.mvDnLft()
+  
+  def mvDnRgt(self) :
+    y = self.player.y + 1
+    x = self.player.x + 1
+    cell = self._world.getCell(x, y)
+    if y < self._world.height and cell.passable:
+      self.player.mvDnRgt()
+  
+  
+  ##############################################
+  ### State transitions
 
   def quitToMenu(self) :
     #self.nextState = self._states['menu']
