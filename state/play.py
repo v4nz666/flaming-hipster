@@ -98,9 +98,14 @@ class Play(State):
   def update(self):
     
     libtcod.console_clear(self.console)
+    if self.player.calculate_fov:
+      self.player.calculate_fov = False
+      libtcod.map_compute_fov(
+        self._world.map, self.player.x, self.player.y, self.player.torchStrength, True, libtcod.FOV_SHADOW)
+    
     self.updateMessages()
     self._gui.render()
-    #self._world.render(self.console)
+    self._world.render(self.console)
     self.player.render(self.console)
     self.player.update()
     

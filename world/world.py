@@ -25,6 +25,7 @@ class World:
     
     self._hm = libtcod.heightmap_new(w,h)
     self._cells = []
+    self._anchors = []
     
     self.initMap()
     self.resetMap()
@@ -55,8 +56,6 @@ class World:
     
         #alt = libtcod.heightmap_get_value(self._hm, x, y)
         #self._cells[x + y * self.width].dig(alt > 1)
-        
-    
     
     ### Celular automaton generation
     caDigDensity = 0.4
@@ -91,7 +90,7 @@ class World:
           else :
             if n <= caNeighboursStarve:
               c.dig(True)
-    
+    self._anchors = []
     return
   
   def countWallNeighbours(self,x, y) :
@@ -112,7 +111,13 @@ class World:
       return c
     except:
       return None
-    
+  
+  def addAnchor(self, x, y):
+    if not (x,y) in self._anchors:
+      self._anchors.append((x,y))
+  def anchorAt(self, x, y) :
+    return (x,y) in self._anchors
+  
   def randomizeHeightmap(self) :
     print "Setting up heightmap"
     hills = 1000
@@ -142,8 +147,16 @@ class World:
       y = 1 + c.y
       x = 1 + c.x
       libtcod.console_set_char_background(console, x, y, getattr(libtcod, c.color))
-      
-      
+    
+    for anchor in self._anchors:
+      x = anchor[0]
+      y = anchor[1]
+      if libtcod.map_is_in_fov(self.map, x, y):
+        #intensity = 0.25 + ((3 * self.calculate_intensity(x, y)) / 4)
+        x = x + 1
+        y = y + 1
+        libtcod.console_put_char(console, x, y, '"')
+        libtcod.console_set_char_foreground(console, x, y, libtcod.white)# * intensity)
   
   def getCells(self) :
     return self._cells

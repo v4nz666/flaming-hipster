@@ -32,6 +32,7 @@ class Player(Item):
   
   def render(self, console):
     if self.calculate_fov:
+      self.calculate_fov = False
       libtcod.map_compute_fov(self.world.map, self.x, self.y, self.torchStrength, True, libtcod.FOV_SHADOW)
     for c in self.world.getCells():
       visible = libtcod.map_is_in_fov(self.world.map, c.x, c.y)
@@ -56,19 +57,10 @@ class Player(Item):
             color = self.world.c_darkWall
       libtcod.console_set_char_background(console, c.x+1, c.y+1, color, libtcod.BKGND_ALPHA(intensity))
     
-    
-    for anchor in self.anchoredRopes:
-      x = 1 + anchor[0]
-      y = 1 + anchor[1]
-      if libtcod.map_is_in_fov(self.world.map, x, y):
-        intensity = 0.25 + ((3 * self.calculate_intensity(x, y)) / 4)
-
-        libtcod.console_put_char(console, x, y, '"')
-        libtcod.console_set_char_foreground(console, x, y, libtcod.white * intensity)
-  
     y = 1 + self.y
     x = 1 + self.x
     libtcod.console_put_char(console, x, y, '@')
+    
     
   def calculate_intensity(self,x, y):
     intensity = 1
@@ -89,18 +81,21 @@ class Player(Item):
     
     if self.ropedOff:
       
-      #already anchored wall
-      if (newX, newY) in self.anchoredRopes:
+      #already anchored wall, just move onto it
+      if self.world.anchorAt(newX, newY):
         pass
       #non-anchored wall, but we have ropes
       elif self.ropes > 0:
-        self.anchoredRopes.append((newX, newY))
+        self.world.addAnchor(newX, newY)
         self.ropes = self.ropes - 1
       #non-anchored, and no ropes, cant go that way
       else:
         newX = self.x
         newY = self.y
-      
+    
+    if self.x != newX or self.y != newY:
+      self.calculate_fov = True
+    
     self.x = newX
     self.y = newY
     
@@ -125,11 +120,15 @@ class Player(Item):
     self.move(1, 1)
   
   def anchorRope(self):
-    self.affectedByGravity = False
-    self.ropedOff = True
-    if self.ropes > 0 and (self.x, self.y) not in self.anchoredRopes:
-      #attach the rope at our feet (y+1)
-      self.anchoredRopes.append((self.x, self.y))
+    
+    if self.world.anchorAt(self.x, self.y):
+      self.affectedByGravity = False
+      self.ropedOff = True
+    elif self.ropes > 0:
+      self.affectedByGravity = False
+      self.ropedOff = True
+      self.world.addAnchor(self.x, self.y)
+      self.ropes = self.ropes - 1
   
   def detach(self):
     self.affectedByGravity = True
