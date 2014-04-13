@@ -59,14 +59,22 @@ class Play(State):
           'key': libtcod.KEY_KP3,
           'ch': None,
           'fn': self.mvDnRgt
+        },
+        
+        'toggleRope': {
+          'key': libtcod.KEY_SPACE,
+          'ch': None,
+          'fn': self.ropeToggle
         }
     }
     )
     
   
   def beforeTransition(self):
+    self.player = player.Player(0,0, self._world)
     self.initGui()
-    
+    self.update()
+
   def initGui(self) :
     self._gui = gui.Gui(self.console)
     
@@ -77,14 +85,11 @@ class Play(State):
     self._gui.addFrame(0,0,self._world.width, libtcod.console_get_height(self.console) - 2, 'Game Board')
     self._gui.addFrame(self._world.width + 1,0,infoWidth,infoHeight,'Info')
     
-    self.update()
-    
   def setWorld(self, world):
     self._world = world
     self.initFovMap()
     
-    #TODO this shouldn't be here
-    self.player = player.Player(0,0, self._world)
+    
   
   def tick(self):
     self.update()
@@ -108,7 +113,8 @@ class Play(State):
   
   def updateMessages(self) :
     self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 2 )
-
+    self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 3 )
+    #self._gui.frames['Info'].addMessage("Hooks    : " + str(self.player.ropes), 3 )
 
   ######################################
   ### Key handlers
@@ -142,31 +148,36 @@ class Play(State):
     y = self.player.y - 1
     x = self.player.x - 1
     cell = self._world.getCell(x, y)
-    if y >= 0 and cell.passable:
+    if y >= 0 and x >= 0 and cell.passable:
       self.player.mvUpLft()
   
   def mvUpRgt(self) :
     y = self.player.y - 1
     x = self.player.x + 1
     cell = self._world.getCell(x, y)
-    if y >= 0 and cell.passable:
+    if y >= 0 and x < self._world.width  and cell.passable:
       self.player.mvUpRgt()
   
   def mvDnLft(self) :
     y = self.player.y + 1
     x = self.player.x - 1
     cell = self._world.getCell(x, y)
-    if y < self._world.height and cell.passable:
+    if y < self._world.height and x >= 0 and cell.passable:
       self.player.mvDnLft()
   
   def mvDnRgt(self) :
     y = self.player.y + 1
     x = self.player.x + 1
     cell = self._world.getCell(x, y)
-    if y < self._world.height and cell.passable:
+    if y < self._world.height and x < self._world.width and cell.passable:
       self.player.mvDnRgt()
   
-  
+  def ropeToggle(self):
+    if self.player.ropedOff:
+      self.player.detach()
+    else:
+      self.player.anchorRope()
+    
   ##############################################
   ### State transitions
 
