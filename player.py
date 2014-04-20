@@ -31,9 +31,6 @@ class Player(Item):
       pass
   
   def render(self, console):
-    if self.calculate_fov:
-      self.calculate_fov = False
-      libtcod.map_compute_fov(self.world.map, self.x, self.y, self.torchStrength, True, libtcod.FOV_SHADOW)
     for c in self.world.getCells():
       visible = libtcod.map_is_in_fov(self.world.map, c.x, c.y)
       
@@ -88,6 +85,10 @@ class Player(Item):
       elif self.ropes > 0:
         self.world.addAnchor(newX, newY)
         self.ropes = self.ropes - 1
+      #no ropes left, but there's ground below the cell we're heading to. A one way trip until you restock on anchors
+      elif not self.world.passable(newX, newY + 1):
+        print "No looking back!"
+        self.detach()
       #non-anchored, and no ropes, cant go that way
       else:
         newX = self.x

@@ -118,6 +118,9 @@ class World:
   def anchorAt(self, x, y) :
     return (x,y) in self._anchors
   
+  def passable(self, x, y):
+    return self._cells[x + y * self.width].passable
+  
   def randomizeHeightmap(self) :
     print "Setting up heightmap"
     hills = 1000

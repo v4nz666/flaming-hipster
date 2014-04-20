@@ -131,7 +131,6 @@ class Play(State):
       self.player.mvUp()
   
   def mvDn(self) :
-    print "Down"
     y = self.player.y + 1;
     cell = self._world.getCell(self.player.x, y)
     if y < self._world.height and cell.passable:
