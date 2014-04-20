@@ -17,18 +17,11 @@ class Player(Item):
   def __init__(self, x, y, world) :
     Item.__init__(self, x, y, world)
     
-    self.calculate_fov = True
     self.torchStrength = 6
     self.torchColor = libtcod.lightest_flame
   
   def update(self):
-    try:
-      if self.affectedByGravity:
-        cellBelow = self.world.getCell(self.x, self.y + 1)
-        if cellBelow.passable:
-          self.mvDn()
-    except:
-      pass
+    pass
   
   def render(self, console):
     for c in self.world.getCells():
@@ -93,9 +86,6 @@ class Player(Item):
       else:
         newX = self.x
         newY = self.y
-    
-    if self.x != newX or self.y != newY:
-      self.calculate_fov = True
     
     self.x = newX
     self.y = newY

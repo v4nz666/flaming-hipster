@@ -161,5 +161,11 @@ class World:
         libtcod.console_put_char(console, x, y, '"')
         libtcod.console_set_char_foreground(console, x, y, libtcod.white)# * intensity)
   
+  def dig(self, x, y, player):
+    libtcod.map_set_properties(self.map, x, y, True, True)
+    libtcod.map_compute_fov(self.map, player.x, player.y, player.torchStrength, True, libtcod.FOV_SHADOW)
+    self.getCell(x, y).dig(True)
+    return True
+  
   def getCells(self) :
     return self._cells
