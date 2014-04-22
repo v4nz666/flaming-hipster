@@ -12,7 +12,7 @@ class Player(Item):
   ropes   = 8
   anchors = 32
   anchored = False
-  clippedRopes = 0
+  clippedRopes = []
   
   def __init__(self, x, y, world) :
     Item.__init__(self, x, y, world)
@@ -76,22 +76,38 @@ class Player(Item):
     newY = self.y + dy
     
     if self.anchored:
-      if self.clippedRopes < self.ropes:
-        
-        self.clippedRopes = self.clippedRopes + 1
-        
+      last = len(self.clippedRopes) - 1
+      
+      # If we're moving to the last visited tile, remove the current tile from the list, and 
+      # regain a clippedRope
+      if last >= 1 and self.clippedRopes[last - 1] == (newX, newY):
+          print "New: ", (newX, newY), " last-1: ", self.clippedRopes[last - 1]
+          self.clippedRopes.pop()
+      # Otherwise, if we have more ropes, do our anchor checks
+      elif len(self.clippedRopes) < self.ropes:
         #already anchored wall, just move onto it
         if self.world.anchorAt(newX, newY):
-          pass
+          self.clippedRopes.append((newX, newY))
         #non-anchored wall, but we have anchors
         elif self.anchors > 0:
           self.world.addAnchor(newX, newY)
+          self.clippedRopes.append((newX, newY))
           self.anchors = self.anchors - 1
-        #no ropes left, but there's ground below the cell we're heading to. A one way trip until you restock on anchors
+        
+        #TODO This isn't working, unless you're at the end of the ropes, I think... 
+        #TODO should work no matter what, if you're out of anchors
+        
+        # No anchors left, but there's ground below the cell we're heading to.
+        # A one way trip until you restock on anchors
         elif not self.world.passable(newX, newY + 1):
           print "No looking back!"
           self.detach()
-      # no ropes left, cant go that way
+      
+        # No anchors left, and no anchor already mounted, can't go that way
+        else:
+          newX = self.x
+          newY = self.y
+      # No ropes left, and no solid ground to jump  to, cant go that way
       else:
         newX = self.x
         newY = self.y
@@ -120,22 +136,20 @@ class Player(Item):
     self.move(1, 1)
   
   def anchorRope(self):
-    if self.ropes > 0 :
-      
-      self.clippedRopes = 1
-      
-      # Already an anchor here, just clip into it
-      if self.world.anchorAt(self.x, self.y):
-        self.affectedByGravity = False
-        self.anchored = True
-        # We've got anchors, so clip in, and 
-      elif self.anchors > 0:
-        self.affectedByGravity = False
-        self.anchored = True
-        self.world.addAnchor(self.x, self.y)
-        self.anchors = self.anchors - 1
-        
+    # Already an anchor here, just clip into it
+    if self.world.anchorAt(self.x, self.y):
+      self.affectedByGravity = False
+      self.anchored = True
+      self.clippedRopes.append((self.x, self.y))
+    # We've got anchors, mount an anchor and clip in,
+    elif self.anchors > 0:
+      self.affectedByGravity = False
+      self.anchored = True
+      self.world.addAnchor(self.x, self.y)
+      self.anchors = self.anchors - 1
+      self.clippedRopes.append((self.x, self.y))
+    
   def detach(self):
     self.affectedByGravity = True
-    self.clippedRopes = 0
+    self.clippedRopes = []
     self.anchored = False
