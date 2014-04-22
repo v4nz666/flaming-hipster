@@ -45,6 +45,12 @@ class Player(Item):
             color = self.world.c_darkOpen
           else:
             color = self.world.c_darkWall
+          
+          rgb = 255 - ((c.y * 255) / self.world.height)
+          
+          overlayColor = libtcod.Color(rgb, rgb, rgb)
+          color = overlayColor * color
+          
       libtcod.console_set_char_background(console, c.x+1, c.y+1, color, libtcod.BKGND_ALPHA(intensity))
     
     y = 1 + self.y
