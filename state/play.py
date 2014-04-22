@@ -124,8 +124,9 @@ class Play(State):
   
   def updateMessages(self) :
     self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 2 )
-    self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.ropes), 3 )
-    #self._gui.frames['Info'].addMessage("Hooks    : " + str(self.player.ropes), 3 )
+    self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 3 )
+    self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 4 )
+    self._gui.frames['Info'].addMessage("Clipped  : " + str(self.player.clippedRopes), 5 )
 
   ######################################
   ### Key handlers
@@ -200,7 +201,7 @@ class Play(State):
       self.player.mvDnRgt()
   
   def ropeToggle(self):
-    if self.player.ropedOff:
+    if self.player.anchored:
       self.player.detach()
     else:
       self.player.anchorRope()

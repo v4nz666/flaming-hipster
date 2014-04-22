@@ -9,10 +9,10 @@ import math
 
 class Player(Item):
 
-  ropes = 64
-  hooks = 64
-  anchoredRopes = []
-  ropedOff = False
+  ropes   = 8
+  anchors = 32
+  anchored = False
+  clippedRopes = 0
   
   def __init__(self, x, y, world) :
     Item.__init__(self, x, y, world)
@@ -75,20 +75,23 @@ class Player(Item):
     newX = self.x + dx
     newY = self.y + dy
     
-    if self.ropedOff:
-      
-      #already anchored wall, just move onto it
-      if self.world.anchorAt(newX, newY):
-        pass
-      #non-anchored wall, but we have ropes
-      elif self.ropes > 0:
-        self.world.addAnchor(newX, newY)
-        self.ropes = self.ropes - 1
-      #no ropes left, but there's ground below the cell we're heading to. A one way trip until you restock on anchors
-      elif not self.world.passable(newX, newY + 1):
-        print "No looking back!"
-        self.detach()
-      #non-anchored, and no ropes, cant go that way
+    if self.anchored:
+      if self.clippedRopes < self.ropes:
+        
+        self.clippedRopes = self.clippedRopes + 1
+        
+        #already anchored wall, just move onto it
+        if self.world.anchorAt(newX, newY):
+          pass
+        #non-anchored wall, but we have anchors
+        elif self.anchors > 0:
+          self.world.addAnchor(newX, newY)
+          self.anchors = self.anchors - 1
+        #no ropes left, but there's ground below the cell we're heading to. A one way trip until you restock on anchors
+        elif not self.world.passable(newX, newY + 1):
+          print "No looking back!"
+          self.detach()
+      # no ropes left, cant go that way
       else:
         newX = self.x
         newY = self.y
@@ -117,16 +120,22 @@ class Player(Item):
     self.move(1, 1)
   
   def anchorRope(self):
-    
-    if self.world.anchorAt(self.x, self.y):
-      self.affectedByGravity = False
-      self.ropedOff = True
-    elif self.ropes > 0:
-      self.affectedByGravity = False
-      self.ropedOff = True
-      self.world.addAnchor(self.x, self.y)
-      self.ropes = self.ropes - 1
-  
+    if self.ropes > 0 :
+      
+      self.clippedRopes = 1
+      
+      # Already an anchor here, just clip into it
+      if self.world.anchorAt(self.x, self.y):
+        self.affectedByGravity = False
+        self.anchored = True
+        # We've got anchors, so clip in, and 
+      elif self.anchors > 0:
+        self.affectedByGravity = False
+        self.anchored = True
+        self.world.addAnchor(self.x, self.y)
+        self.anchors = self.anchors - 1
+        
   def detach(self):
     self.affectedByGravity = True
-    self.ropedOff = False
+    self.clippedRopes = 0
+    self.anchored = False
