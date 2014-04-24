@@ -126,7 +126,7 @@ class Play(State):
     self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 2 )
     self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 3 )
     self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 4 )
-    self._gui.frames['Info'].addMessage("Clipped  : " + str(self.player.clippedRopes), 5 )
+    self._gui.frames['Info'].addMessage("Clipped  : " + str(len(self.player.clippedRopes)), 5 )
 
   ######################################
   ### Key handlers

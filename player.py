@@ -76,45 +76,53 @@ class Player(Item):
     newY = self.y + dy
     
     if self.anchored:
-      last = len(self.clippedRopes) - 1
       
-      # If we're moving to the last visited tile, remove the current tile from the list, and 
-      # regain a clippedRope
-      if last >= 1 and self.clippedRopes[last - 1] == (newX, newY):
-          print "New: ", (newX, newY), " last-1: ", self.clippedRopes[last - 1]
-          self.clippedRopes.pop()
-      # Otherwise, if we have more ropes, do our anchor checks
-      elif len(self.clippedRopes) < self.ropes:
-        #already anchored wall, just move onto it
-        if self.world.anchorAt(newX, newY):
-          self.clippedRopes.append((newX, newY))
-        #non-anchored wall, but we have anchors
-        elif self.anchors > 0:
-          self.world.addAnchor(newX, newY)
-          self.clippedRopes.append((newX, newY))
-          self.anchors = self.anchors - 1
-        
-        #TODO This isn't working, unless you're at the end of the ropes, I think... 
-        #TODO should work no matter what, if you're out of anchors
-        
-        # No anchors left, but there's ground below the cell we're heading to.
-        # A one way trip until you restock on anchors
-        elif not self.world.passable(newX, newY + 1):
-          print "No looking back!"
-          self.detach()
-      
-        # No anchors left, and no anchor already mounted, can't go that way
-        else:
-          newX = self.x
-          newY = self.y
-      # No ropes left, and no solid ground to jump  to, cant go that way
-      else:
-        newX = self.x
-        newY = self.y
+      (newX, newY) = self.anchoredMove(newX, newY)
     
     self.x = newX
     self.y = newY
+  
+  def anchoredMove(self, newX, newY):
     
+    # Moving to the last-visited tile, remove the current tile from the list, and 
+    # regain a clippedRope
+    last = len(self.clippedRopes) - 1
+    if last > 0 and self.clippedRopes[last - 1] == (newX, newY):
+        self.clippedRopes.pop()
+    # Otherwise, if we have more ropes, do our anchor/jump checks
+    elif len(self.clippedRopes) < self.ropes:
+      # Already anchored wall, move onto it, and extend our rope path
+      if self.world.anchorAt(newX, newY):
+        self.clippedRopes.append((newX, newY))
+      # Non-anchored wall, but we have anchors. Add an anchor, and extend our rope path
+      elif self.anchors > 0:
+        self.world.addAnchor(newX, newY)
+        self.clippedRopes.append((newX, newY))
+        self.anchors = self.anchors - 1
+      # Non-anchored wall, and no anchors left, check if there is ground to jump to
+      else:
+        # No anchors left, but there's ground below the cell we're heading to.
+        if not self.world.passable(newX, newY + 1):
+          print "No looking back!"
+          self.detach()
+        # No anchor already mounted, and no solid ground to jump to - can't go that way
+        else:
+          newX = self.x
+          newY = self.y
+    
+    # No ropes left, but there's ground to jump to.
+    elif not self.world.passable(newX, newY + 1):
+      print "No looking back!"
+      self.detach()
+        
+    # No ropes left, and no solid ground to jump  to, cant go that way
+    else:
+      newX = self.x
+      newY = self.y
+    
+    return (newX, newY)
+  #end anchoredMove
+  
   def mvUp(self):
     self.move(0, -1)
   def mvDn(self):
