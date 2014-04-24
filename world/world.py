@@ -3,6 +3,7 @@ World module
 
 '''
 import cell
+from items import Items
 import random
 import libtcodpy as libtcod
 
@@ -31,7 +32,6 @@ class World:
     self.resetMap()
     
     return
-  
   
   def initMap(self) :
     print "Initing map"
@@ -68,7 +68,6 @@ class World:
     while digCount > 0:
       x = random.randint(0, self.width - 1)
       y = random.randint(0, self.height - 1)
-      print(x,y)
       c = self.getCell(x,y)
       if not c.passable:
         digCount = digCount - 1
@@ -91,6 +90,7 @@ class World:
             if n <= caNeighboursStarve:
               c.dig(True)
     self._anchors = []
+    print "Done."
     return
   
   def countWallNeighbours(self,x, y) :
@@ -113,13 +113,19 @@ class World:
       return None
   
   def addAnchor(self, x, y):
-    if not (x,y) in self._anchors:
-      self._anchors.append((x,y))
+    if not self.anchorAt(x,y):
+      c = self.getCell(x,y)
+      c.addItem(Items.Anchor)
   def anchorAt(self, x, y) :
-    return (x,y) in self._anchors
+    c = self.getCell(x,y)
+    print "Anchor Check", c.items
+    return Items.Anchor in c.items
   
   def passable(self, x, y):
-    return self._cells[x + y * self.width].passable
+    try:
+      return self._cells[x + y * self.width].passable
+    except IndexError:
+      return False
   
   def randomizeHeightmap(self) :
     print "Setting up heightmap"
@@ -143,23 +149,27 @@ class World:
     
     libtcod.heightmap_normalize(self._hm, 0.0, 2.0)
   
-  def render(self, console) :
-    # Draw each cell...
-    for c in self._cells:
-      # Our actual position on the screen, offset by 1 for the frame...
-      y = 1 + c.y
-      x = 1 + c.x
-      libtcod.console_set_char_background(console, x, y, getattr(libtcod, c.color))
+  def render(self, frame, yOffset) :
+    # Loop over every row inside the frame
+    for y in range(frame.innerHeight):
+      for x in range(frame.innerWidth + 1):
+        c = self._cells[x + (y + yOffset) * self.width]
+        # Our actual position on the screen, offset by 1 for the frame...
+        frame.setBgColor(x, y, c.color, libtcod.BKGND_SET)
+        if len(c.items) > 0 and libtcod.map_is_in_fov(self.map, x, y):
+          #display the top-most item
+          item = c.items[len(c.items)-1]
+          frame.putChar(x, y, item.char, item.color)
     
+  def renderItems(self, frame, offset):
     for anchor in self._anchors:
       x = anchor[0]
       y = anchor[1]
       if libtcod.map_is_in_fov(self.map, x, y):
-        #intensity = 0.25 + ((3 * self.calculate_intensity(x, y)) / 4)
         x = x + 1
         y = y + 1
-        libtcod.console_put_char(console, x, y, '"')
-        libtcod.console_set_char_foreground(console, x, y, libtcod.white)# * intensity)
+        #libtcod.console_put_char(console, x, y, '"')
+        #libtcod.console_set_char_foreground(console, x, y, libtcod.white)
   
   def dig(self, x, y, player):
     libtcod.map_set_properties(self.map, x, y, True, True)

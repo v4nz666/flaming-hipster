@@ -2,21 +2,21 @@
 Display
 
 '''
-from item import Item
-from rope import Rope
 import libtcodpy as libtcod
 import math
 
-class Player(Item):
-
-  ropes   = 8
-  anchors = 32
-  anchored = False
-  clippedRopes = []
+class Player():
   
   def __init__(self, x, y, world) :
-    Item.__init__(self, x, y, world)
+    self.x = x
+    self.y = y
+    self.world = world
     
+    self.ropes   = 8
+    self.anchors = 32
+    self.anchored = False
+    self.clippedRopes = []
+
     self.torchStrength = 6
     self.torchColor = libtcod.lightest_flame
   
@@ -103,7 +103,6 @@ class Player(Item):
       else:
         # No anchors left, but there's ground below the cell we're heading to.
         if not self.world.passable(newX, newY + 1):
-          print "No looking back!"
           self.detach()
         # No anchor already mounted, and no solid ground to jump to - can't go that way
         else:
@@ -146,18 +145,15 @@ class Player(Item):
   def anchorRope(self):
     # Already an anchor here, just clip into it
     if self.world.anchorAt(self.x, self.y):
-      self.affectedByGravity = False
       self.anchored = True
       self.clippedRopes.append((self.x, self.y))
     # We've got anchors, mount an anchor and clip in,
     elif self.anchors > 0:
-      self.affectedByGravity = False
       self.anchored = True
       self.world.addAnchor(self.x, self.y)
       self.anchors = self.anchors - 1
       self.clippedRopes.append((self.x, self.y))
     
   def detach(self):
-    self.affectedByGravity = True
     self.clippedRopes = []
     self.anchored = False

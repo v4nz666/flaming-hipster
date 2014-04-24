@@ -13,6 +13,7 @@ class Cell :
     self.color = b'black'
     self.passable = False
     self.discovered = False
+    self.items = []
   
   def dig(self, passable) :
     self.passable = passable
@@ -20,3 +21,6 @@ class Cell :
       self.color = b'grey'
     else :
       self.color = b'black'
+  
+  def addItem(self, item):
+    self.items.append(item)

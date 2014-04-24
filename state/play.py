@@ -80,11 +80,11 @@ class Play(State):
   def initGui(self) :
     self._gui = gui.Gui(self.console)
     
-    infoWidth = libtcod.console_get_width(self.console) - (3 + self._world.width)
+    infoWidth = libtcod.console_get_width(self.console) - (2 + self._world.width)
     infoHeight = 10
     
     #Our list of frames
-    self._gui.addFrame(0,0,self._world.width, libtcod.console_get_height(self.console) - 2, 'Game Board')
+    self._gui.addFrame(0,0,self._world.width + 1, libtcod.console_get_height(self.console), 'Main')
     self._gui.addFrame(self._world.width + 1,0,infoWidth,infoHeight,'Info')
   
   def setWorld(self, world):
@@ -104,10 +104,11 @@ class Play(State):
     
     self.updateMessages()
     self._gui.render()
-    self._world.render(self.console)
+    self._world.render(self._gui.frames['Main'], 0)
+    self._world.renderItems(self._gui.frames['Main'], 0)
     self.player.render(self.console)
     try:
-      if self.player.affectedByGravity:
+      if not self.player.anchored:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
         if cellBelow.passable:
           self.calculateFov = True

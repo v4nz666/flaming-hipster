@@ -1,10 +1,7 @@
 class Item():
-  def __init__(self, x, y, world):
-    self.x = x
-    self.y = y
-    
-    self.ch = " "
-    
-    self.world = world
+  def __init__(self, name, char, color):
+    self.name = name
+    self.char = char
+    self.color = color
     self.affectedByGravity = True
     

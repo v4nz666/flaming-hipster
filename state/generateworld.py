@@ -10,6 +10,7 @@ class GenerateWorld(State):
     State.__init__(self, disp)
     
     self.initWorld(width, height)
+
     self.initGui()
     
     self.registerInputHandlers()
@@ -66,11 +67,11 @@ class GenerateWorld(State):
   def initGui(self) :
     self._gui = gui.Gui(self.console)
     
-    infoWidth = libtcod.console_get_width(self.console) - (3 + self._world.width)
-    infoHeight = 10 #libtcod.console_get_height(self.console)
+    infoWidth = libtcod.console_get_width(self.console) - (2 + self._world.width)
+    infoHeight = 10
     
     #Our list of frames
-    self._gui.addFrame(0,0,self._world.width, libtcod.console_get_height(self.console) - 2, 'Game Board')
+    self._gui.addFrame(0,0,self._world.width + 1, libtcod.console_get_height(self.console), 'Main')
     self._gui.addFrame(self._world.width + 1,0,infoWidth,infoHeight,'Info')
       
     self.selectedX = 0;
@@ -87,11 +88,8 @@ class GenerateWorld(State):
     self.updateMessages()
     self._gui.render()
     
-    #TODO Move this world-drawing bit somewhere it can be used by other states
-    cells = self._world.getCells()
-    
     selected = self.getSelected()
-    self._world.render(self.console);
+    self._world.render(self._gui.frames['Main'], 0);
     
     for c in self._world.getCells():
       # If we're rendering the selected cell, add our selector's color
@@ -99,8 +97,7 @@ class GenerateWorld(State):
           x = c.x + 1
           y = c.y + 1
           
-          libtcod.console_set_char_background(self.console, x, y, libtcod.green, libtcod.BKGND_ADDALPHA(0.4))
-
+          libtcod.console_set_char_background(self.console, x, y, libtcod.cyan, libtcod.BKGND_ADDALPHA(0.4))
   
   def updateMessages(self) :
     self._gui.frames['Info'].addMessage("Position : "  + str(self.getSelected()), 2 )
