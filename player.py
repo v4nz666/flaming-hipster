@@ -16,11 +16,19 @@ class Player():
     self.anchors = 32
     self.anchored = False
     self.clippedRopes = []
-
+    
+    self.timer = 0
+    
+    self.health = 100.0
+    self.healthStep = 1
+    self.healthInterval = 120
     self.torchStrength = 6
   
   def update(self):
-    pass
+    self.timer = self.timer + 1
+    if not self.timer % self.healthInterval:
+      self.health = self.health - self.healthStep
+    
   
   def move(self, dx, dy):
     newX = self.x + dx
