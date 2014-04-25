@@ -5,6 +5,7 @@ World module
 import cell
 from items import Items
 import random
+import math
 import libtcodpy as libtcod
 
 class World:
@@ -18,6 +19,7 @@ class World:
   c_lightWall = libtcod.light_grey
   c_darkOpen = libtcod.darkest_grey
   c_darkWall = libtcod.darkest_grey * 0.5
+  c_torch = libtcod.lightest_flame
   
   def __init__(self,w, h) :
     
@@ -149,17 +151,81 @@ class World:
     
     libtcod.heightmap_normalize(self._hm, 0.0, 2.0)
   
-  def render(self, frame, yOffset) :
+  def calculateOffset(self, y, frame):
+    
+    if y < frame.innerHeight / 2:
+      self.yOffset = 0
+    elif y >= self.height - frame.innerHeight / 2:
+      self. yOffset = self.height - frame.innerHeight
+    else:
+      self.yOffset = y - frame.innerHeight / 2
+    
+  
+  def render(self, frame, player = False) :
     # Loop over every row inside the frame
     for y in range(frame.innerHeight):
       for x in range(frame.innerWidth + 1):
-        c = self._cells[x + (y + yOffset) * self.width]
-        # Our actual position on the screen, offset by 1 for the frame...
+        c = self._cells[x + (y + self.yOffset) * self.width]
+        
+        # First draw the background color (black/grey)
         frame.setBgColor(x, y, c.color, libtcod.BKGND_SET)
-        if len(c.items) > 0 and libtcod.map_is_in_fov(self.map, x, y):
-          #display the top-most item
+        
+        # Render the top item, if there are any here
+        if len(c.items) > 0 and libtcod.map_is_in_fov(self.map, c.x, c.y):
           item = c.items[len(c.items)-1]
           frame.putChar(x, y, item.char, item.color)
+        
+        if player:
+          self.renderPlayerOverlay(frame, player, c)
+        
+        
+          
+  def renderPlayerOverlay(self, frame, player, cell):
+    
+    visible = libtcod.map_is_in_fov(self.map, cell.x, cell.y)
+      
+    if visible:
+      cell.discovered = True
+      intensity = self.calculateIntensity(player, cell.x, cell.y)
+      
+      if cell.passable:
+        color = self.c_lightOpen * self.c_torch
+      else:
+        color = self.c_lightWall * self.c_torch
+    else:
+      intensity = 1
+      if not cell.discovered:
+        color = libtcod.black
+      else:
+        if cell.passable:
+          color = self.c_darkOpen
+        else:
+          color = self.c_darkWall
+        
+        rgb = 255 - ((cell.y * 255) / self.height)
+        
+        overlayColor = libtcod.Color(rgb, rgb, rgb)
+        color = overlayColor * color
+        
+    frame.setBgColor(cell.x, cell.y - self.yOffset, color, libtcod.BKGND_ALPHA(intensity))
+    
+    y = player.y - self.yOffset
+    x = player.x
+    frame.putChar(x, y, '@', b'white')
+    
+  def calculateIntensity(self, player, x, y):
+    intensity = 1
+    
+    deltaX = player.x - x
+    deltaY = player.y - y
+    
+    distance = math.sqrt(math.pow(deltaX,2) + math.pow(deltaY, 2))
+    
+    if distance > 0:
+      intensity = 1 - math.pow(distance / player.torchStrength, 2)
+      intensity = 1.0 / 4.0 + (3*intensity) / 4
+    return intensity
+  
     
   def dig(self, x, y, player):
     libtcod.map_set_properties(self.map, x, y, True, True)

@@ -91,13 +91,14 @@ class GenerateWorld(State):
     self._gui.render()
     
     selected = self.getSelected()
-    self._world.render(self._gui.frames['Main'], 0);
+    self._world.calculateOffset(self.selectedY, self._gui.frames['Main'])
+    self._world.render(self._gui.frames['Main']);
     
     for c in self._world.getCells():
       # If we're rendering the selected cell, add our selector's color
         if selected[0] == c.x and selected[1] == c.y :
           x = c.x + 1
-          y = c.y + 1
+          y = c.y + 1 - self._world.yOffset
           
           libtcod.console_set_char_background(self.console, x, y, libtcod.cyan, libtcod.BKGND_ADDALPHA(0.4))
   

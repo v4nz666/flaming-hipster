@@ -47,7 +47,11 @@ class Frame:
   def setBgColor(self, x, y, col, flag):
     screenX = x + self.x + 1
     screenY = y + self.y + 1
-    libtcod.console_set_char_background(self.console, screenX, screenY, getattr(libtcod, col), flag)
+    
+    if isinstance(col, type(b'')):
+      col = getattr(libtcod, col)
+    
+    libtcod.console_set_char_background(self.console, screenX, screenY, col, flag)
   
   def addMessage(self, str, pos) :
     self.messages[pos] = str

@@ -18,58 +18,9 @@ class Player():
     self.clippedRopes = []
 
     self.torchStrength = 6
-    self.torchColor = libtcod.lightest_flame
   
   def update(self):
     pass
-  
-  def render(self, console):
-    for c in self.world.getCells():
-      visible = libtcod.map_is_in_fov(self.world.map, c.x, c.y)
-      
-      if visible:
-        c.discovered = True
-        intensity = self.calculate_intensity(c.x, c.y)
-        #print"dx, dy, d, d/tS, i:", (deltaX, deltaY, distance, distance / self.torchStrength, intensity)
-        
-        if c.passable:
-          color = self.world.c_lightOpen * self.torchColor
-        else:
-          color = self.world.c_lightWall * self.torchColor
-      else:
-        intensity = 1
-        if not c.discovered:
-          color = libtcod.black
-        else:
-          if c.passable:
-            color = self.world.c_darkOpen
-          else:
-            color = self.world.c_darkWall
-          
-          rgb = 255 - ((c.y * 255) / self.world.height)
-          
-          overlayColor = libtcod.Color(rgb, rgb, rgb)
-          color = overlayColor * color
-          
-      libtcod.console_set_char_background(console, c.x+1, c.y+1, color, libtcod.BKGND_ALPHA(intensity))
-    
-    y = 1 + self.y
-    x = 1 + self.x
-    libtcod.console_put_char(console, x, y, '@')
-    
-    
-  def calculate_intensity(self,x, y):
-    intensity = 1
-    
-    deltaX = self.x - x
-    deltaY = self.y - y
-    
-    distance = math.sqrt(math.pow(deltaX,2) + math.pow(deltaY, 2))
-    
-    if distance > 0:
-      intensity = 1 - math.pow(distance / self.torchStrength, 2)
-      intensity = 1.0 / 4.0 + (3*intensity) / 4
-    return intensity
   
   def move(self, dx, dy):
     newX = self.x + dx

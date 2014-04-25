@@ -104,8 +104,9 @@ class Play(State):
     
     self.updateMessages()
     self._gui.render()
-    self._world.render(self._gui.frames['Main'], 0)
-    self.player.render(self.console)
+    
+    self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
+    self._world.render(self._gui.frames['Main'], self.player)
     try:
       if not self.player.anchored:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
