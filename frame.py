@@ -74,7 +74,7 @@ class Frame:
     self.colText = getattr(libtcod, col)
     
   def setFrameColor(self, col) :
-    self.colFrame= getattr(libtcod, col)
+    self.colFrame = getattr(libtcod, col)
     
   def renderFrame(self) :
     for i in range (self.w + 1) :

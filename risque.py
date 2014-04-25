@@ -23,13 +23,15 @@ disp = disp.Display(CONSOLE_WIDTH, CONSOLE_HEIGHT)
 s_Menu = state.Menu(disp)
 s_WorldGen = state.GenerateWorld(disp, WIN_MAIN_WIDTH, WORLD_HEIGHT)
 s_Play = state.Play(disp)
+s_Death = state.Death(disp)
 s_Quit = state.Quit(disp)
 
 states = {
   'quit': s_Quit,
   'menu': s_Menu,
   'generate': s_WorldGen,
-  'play': s_Play
+  'play': s_Play,
+  'death': s_Death
 }
 
 

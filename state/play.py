@@ -115,7 +115,8 @@ class Play(State):
           self.player.mvDn()
     except:
       pass
-    self.player.update()
+    if not self.player.update():
+      self.nextState = self._states['death']
 
   def initFovMap(self):
     for x in range(self._world.width):

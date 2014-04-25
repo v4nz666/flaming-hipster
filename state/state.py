@@ -8,10 +8,11 @@ import libtcodpy as libtcod
 class State:
   def __init__(self, disp):
     self.inputHandler = input.InputHandler()
-    self.reset()
     
     self.disp = disp
     self.console = libtcod.console_new(disp.width, disp.height)
+    
+    self.reset()
   
   def tick(self):
     print("Default tick handler")
@@ -22,6 +23,7 @@ class State:
   
   def reset(self):
     self.nextState = self
+    libtcod.console_clear(self.console)
   
   def getConsole(self):
       return self.console

@@ -19,9 +19,9 @@ class Player():
     
     self.timer = 0
     
-    self.health = 100.0
+    self.health = 100
     self.healthStep = 1
-    self.healthInterval = 120
+    self.healthInterval = 60
     self.torchStrength = 6
   
   def update(self):
@@ -29,6 +29,10 @@ class Player():
     if not self.timer % self.healthInterval:
       self.health = self.health - self.healthStep
     
+    if self.health <= 0:
+      return False
+    
+    return True
   
   def move(self, dx, dy):
     newX = self.x + dx
