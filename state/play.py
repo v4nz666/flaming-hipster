@@ -105,7 +105,6 @@ class Play(State):
     self.updateMessages()
     self._gui.render()
     self._world.render(self._gui.frames['Main'], 0)
-    self._world.renderItems(self._gui.frames['Main'], 0)
     self.player.render(self.console)
     try:
       if not self.player.anchored:

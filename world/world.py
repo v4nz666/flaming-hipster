@@ -29,7 +29,6 @@ class World:
     self._anchors = []
     
     self.initMap()
-    self.resetMap()
     
     return
   
@@ -40,6 +39,7 @@ class World:
       for x in range(self.width) :
         c = cell.Cell(x,y)
         self._cells.append(c)
+    self.resetMap()
     return
   
   def resetMap(self):
@@ -161,16 +161,6 @@ class World:
           item = c.items[len(c.items)-1]
           frame.putChar(x, y, item.char, item.color)
     
-  def renderItems(self, frame, offset):
-    for anchor in self._anchors:
-      x = anchor[0]
-      y = anchor[1]
-      if libtcod.map_is_in_fov(self.map, x, y):
-        x = x + 1
-        y = y + 1
-        #libtcod.console_put_char(console, x, y, '"')
-        #libtcod.console_set_char_foreground(console, x, y, libtcod.white)
-  
   def dig(self, x, y, player):
     libtcod.map_set_properties(self.map, x, y, True, True)
     libtcod.map_compute_fov(self.map, player.x, player.y, player.torchStrength, True, libtcod.FOV_SHADOW)

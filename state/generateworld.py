@@ -77,7 +77,9 @@ class GenerateWorld(State):
     self.selectedX = 0;
     self.selectedY = 0;
   
-  
+  def beforeTransition(self):
+      self._world.resetMap()
+      self.update()
   
   def tick(self):
     self.update()
