@@ -17,7 +17,7 @@ WORLD_HEIGHT = WIN_MAIN_HEIGHT * 5
 
 CONSOLE_WIDTH = 3 + WIN_MAIN_WIDTH + WIN_RIGHT_WIDTH
 CONSOLE_HEIGHT = 2 + WIN_MAIN_HEIGHT
-
+print CONSOLE_WIDTH, CONSOLE_HEIGHT
 disp = disp.Display(CONSOLE_WIDTH, CONSOLE_HEIGHT)
 
 s_Menu = state.Menu(disp)
@@ -35,8 +35,8 @@ states = {
 }
 
 
-for (name, state) in states.items():
-  state.registerStates(states)
+for (name, s) in states.items():
+  s.registerStates(states)
 
 '''
 Main

@@ -22,7 +22,7 @@ class Player():
     self.health = 100
     self.healthStep = 1
     self.healthInterval = 60
-    self.torchStrength = 6
+    self.torchStrength = 10
   
   def update(self):
     self.timer = self.timer + 1

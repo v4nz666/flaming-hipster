@@ -125,6 +125,7 @@ class Play(State):
         libtcod.map_set_properties(self._world.map, x, y, c.passable, c.passable)
   
   def updateMessages(self) :
+    self._gui.frames['Info'].addMessage(str(1 / libtcod.sys_get_last_frame_length()) + "FPS", 1)
     self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 2 )
     self._gui.frames['Info'].addMessage("Health   : " + str(int(self.player.health)), 3 )
     self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 5 )

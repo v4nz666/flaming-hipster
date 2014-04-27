@@ -73,7 +73,7 @@ class World:
       c = self.getCell(x,y)
       if not c.passable:
         digCount = digCount - 1
-        self._cells[x + y * self.width].dig(True)
+        self._cells[x + y * self.width].empty()
     
     for i in range(caIterations):
       neighbours = [[None for _y in range(self.height)] for _x in range(self.width)]
@@ -87,11 +87,11 @@ class World:
           n = neighbours[x][y]
           if c.passable :
             if n >= caNeighboursSpawn:
-              c.dig(False)
+              c.fill()
           else :
             if n <= caNeighboursStarve:
-              c.dig(True)
-    self._anchors = []
+              c.empty()
+    self._addWater()
     print "Done."
     return
   
@@ -105,6 +105,22 @@ class World:
         if c and not c.passable :
           n = n + 1
     return n
+  
+  def _addWater(self):
+    
+    waterProb = 0.0025
+    waterCount = len(self._cells) * waterProb
+    print "Water Count: " , waterCount, '/', len(self._cells)
+    
+    cellCount = len(self._cells) - 1
+    
+    while waterCount > 0 :
+      i = random.randint(0, cellCount)
+      c = self._cells[i]
+      if c.passable and not c.hasItem(Items.Water):
+        c.addItem(Items.Water)
+        print "Water left: ", waterCount
+        waterCount -= 1
     
   def getCell(self,x, y) :
     
@@ -160,7 +176,6 @@ class World:
     else:
       self.yOffset = y - frame.innerHeight / 2
     
-  
   def render(self, frame, player = False) :
     # Loop over every row inside the frame
     for y in range(frame.innerHeight):
@@ -177,9 +192,7 @@ class World:
         
         if player:
           self.renderPlayerOverlay(frame, player, c)
-        
-        
-          
+  
   def renderPlayerOverlay(self, frame, player, cell):
     
     visible = libtcod.map_is_in_fov(self.map, cell.x, cell.y)
@@ -228,10 +241,12 @@ class World:
   
     
   def dig(self, x, y, player):
-    libtcod.map_set_properties(self.map, x, y, True, True)
-    libtcod.map_compute_fov(self.map, player.x, player.y, player.torchStrength, True, libtcod.FOV_SHADOW)
-    self.getCell(x, y).dig(True)
-    return True
+    if self.getCell(x, y).dig():
+      libtcod.map_set_properties(self.map, x, y, True, True)
+      return True
+    else:
+      return False
+    
   
   def getCells(self) :
     return self._cells
