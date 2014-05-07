@@ -42,4 +42,6 @@ class Cell :
   def hasItem(self, item):
     return item in self.items
   
+  def hasItems(self):
+    return len(self.items) > 0
   

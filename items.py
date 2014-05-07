@@ -8,7 +8,8 @@ class Items():
   })
   Water = Item('Water', '~', b'light_blue')
   Water.setOptions({
-    'affectedByGravity': False
+    'affectedByGravity': False,
+    'collectedAttribute': ['health', 10]
   })
   Iron = Item('Iron', '+', b'silver')
   Iron.setOptions({

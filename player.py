@@ -4,6 +4,7 @@ Display
 '''
 import libtcodpy as libtcod
 import math
+from items import Items
 
 class Player():
   
@@ -19,11 +20,17 @@ class Player():
     
     self.timer = 0
     
-    self.health = 100
+    self.max_health = 100
+    self.min_health = -1
+    self.health = self.max_health
+    
     self.healthStep = 1
     self.healthInterval = 60
-    self.torchStrength = 10
-  
+    
+    self.max_torchStrength = 12
+    self.min_torchStrength = 1
+    self.torchStrength = self.max_torchStrength
+    
   def update(self):
     self.timer = self.timer + 1
     if not self.timer % self.healthInterval:
@@ -39,12 +46,36 @@ class Player():
     newY = self.y + dy
     
     if self.anchored:
-      
       (newX, newY) = self.anchoredMove(newX, newY)
     
     self.x = newX
     self.y = newY
-  
+    
+    newCell = self.world.getCell(newX, newY)
+    if newCell.hasItems():
+      for i in newCell.items:
+        if i.collectible:
+          newCell.removeItem(i)
+          if i.collectedAttribute:
+            attr = i.collectedAttribute[0]
+            val = i.collectedAttribute[1]
+            self.setAttr(attr, val)
+            
+      
+  def setAttr(self, attr, val):
+    if hasattr(self, attr):
+      
+      max = getattr(self, "max_" + attr)
+      min = getattr(self, "min_" + attr)
+      
+      oldVal = getattr(self, attr)
+      newVal = oldVal + val
+      if newVal > max:
+        newVal = max
+      elif newVal < min:
+        newVal = min
+      setattr(self,attr, newVal)
+      
   def anchoredMove(self, newX, newY):
     
     # Moving to the last-visited tile, remove the current tile from the list, and 
@@ -55,7 +86,7 @@ class Player():
     # Otherwise, if we have more ropes, do our anchor/jump checks
     elif len(self.clippedRopes) < self.ropes:
       # Already anchored wall, move onto it, and extend our rope path
-      if self.world.anchorAt(newX, newY):
+      if self.world.getCell(newX, newY).hasItem(Items.Anchor):
         self.clippedRopes.append((newX, newY))
       # Non-anchored wall, but we have anchors. Add an anchor, and extend our rope path
       elif self.anchors > 0:
@@ -107,7 +138,7 @@ class Player():
   
   def anchorRope(self):
     # Already an anchor here, just clip into it
-    if self.world.anchorAt(self.x, self.y):
+    if self.world.getCell(self.x, self.y).hasItem(Items.Anchor):
       self.anchored = True
       self.clippedRopes.append((self.x, self.y))
     # We've got anchors, mount an anchor and clip in,

@@ -3,8 +3,11 @@ class Item():
     self.name = name
     self.char = char
     self.color = color
-    self.collectible = True
     self.affectedByGravity = True
+    
+    self.collectible = True
+    self.collectedAttribute = None
+    self.keepInInventory = False
     
   def setOptions(self, options):
     for k in options:
