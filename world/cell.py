@@ -35,5 +35,11 @@ class Cell :
   def addItem(self, item):
     self.items.append(item)
   
+  def removeItem(self, item):
+    self.items.remove(item)
+    print "Item removed. Items", self.items
+  
   def hasItem(self, item):
     return item in self.items
+  
+  

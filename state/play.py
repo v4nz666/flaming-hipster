@@ -105,6 +105,7 @@ class Play(State):
     self.updateMessages()
     self._gui.render()
     
+    self._world.update()
     self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
     self._world.render(self._gui.frames['Main'], self.player)
     try:

@@ -92,6 +92,7 @@ class World:
             if n <= caNeighboursStarve:
               c.empty()
     self._addWater()
+    self._addOres()
     print "Done."
     return
   
@@ -107,23 +108,23 @@ class World:
     return n
   
   def _addWater(self):
+    self._addItems(Items.Water, 0.002, True)
     
-    waterProb = 0.0025
-    waterCount = len(self._cells) * waterProb
-    print "Water Count: " , waterCount, '/', len(self._cells)
-    
+  def _addOres(self):
+    self._addItems(Items.Iron, 0.0015, False)
+  
+  def _addItems(self, item, prob, passable):
+    count = len(self._cells) * prob
     cellCount = len(self._cells) - 1
     
-    while waterCount > 0 :
+    while count > 0 :
       i = random.randint(0, cellCount)
       c = self._cells[i]
-      if c.passable and not c.hasItem(Items.Water):
-        c.addItem(Items.Water)
-        print "Water left: ", waterCount
-        waterCount -= 1
-    
+      if c.passable == passable and not c.hasItem(item):
+        c.addItem(item)
+        count -= 1
+  
   def getCell(self,x, y) :
-    
     try:
       c = self._cells[x + y * self.width]
       return c
@@ -131,13 +132,9 @@ class World:
       return None
   
   def addAnchor(self, x, y):
-    if not self.anchorAt(x,y):
-      c = self.getCell(x,y)
-      c.addItem(Items.Anchor)
-  def anchorAt(self, x, y) :
     c = self.getCell(x,y)
-    print "Anchor Check", c.items
-    return Items.Anchor in c.items
+    if not c.hasItem(Items.Anchor):
+      c.addItem(Items.Anchor)
   
   def passable(self, x, y):
     try:
@@ -175,22 +172,38 @@ class World:
       self. yOffset = self.height - frame.innerHeight
     else:
       self.yOffset = y - frame.innerHeight / 2
+  
+  def update(self):
+    for c in self._cells:
+      if len(c.items) > 0 :
+        for item in c.items:
+          if item.affectedByGravity:
+            cellBelow = self.getCell(c.x, c.y+1)
+            if cellBelow and cellBelow.passable:
+              print "Item", item.name, " fell..."
+              cellBelow.addItem(item)
+              c.removeItem(item)
+            
+      
     
+  
   def render(self, frame, player = False) :
     # Loop over every row inside the frame
     for y in range(frame.innerHeight):
+      yIndex = (y + self.yOffset) * self.width
       for x in range(frame.innerWidth + 1):
-        c = self._cells[x + (y + self.yOffset) * self.width]
+        c = self._cells[x + yIndex]
         
         # First draw the background color (black/grey)
         frame.setBgColor(x, y, c.color, libtcod.BKGND_SET)
         
-        # Render the top item, if there are any here
-        if len(c.items) > 0 and libtcod.map_is_in_fov(self.map, c.x, c.y):
-          item = c.items[len(c.items)-1]
-          frame.putChar(x, y, item.char, item.color)
-        
+        # If we're in game mode, show the items, and render the player's torch overlay.
         if player:
+          # Render the top item, if there are any here
+          if len(c.items) > 0 and libtcod.map_is_in_fov(self.map, c.x, c.y):
+            item = c.items[len(c.items)-1]
+            frame.putChar(x, y, item.char, item.color)
+          
           self.renderPlayerOverlay(frame, player, c)
   
   def renderPlayerOverlay(self, frame, player, cell):

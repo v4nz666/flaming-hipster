@@ -3,5 +3,10 @@ class Item():
     self.name = name
     self.char = char
     self.color = color
+    self.collectible = True
     self.affectedByGravity = True
     
+  def setOptions(self, options):
+    for k in options:
+      value = options[k]
+      setattr(self, k, value)
