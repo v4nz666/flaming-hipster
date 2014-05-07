@@ -19,7 +19,9 @@ class World:
   c_lightWall = libtcod.light_grey
   c_darkOpen = libtcod.darkest_grey
   c_darkWall = libtcod.darkest_grey * 0.5
-  c_torch = libtcod.lightest_flame
+  c_torch = libtcod.desaturated_flame
+  #torch alpha
+  a_torch = 0.5
   
   def __init__(self,w, h) :
     
@@ -108,7 +110,7 @@ class World:
     return n
   
   def _addWater(self):
-    self._addItems(Items.Water, 0.002, True)
+    self._addItems(Items.Water, 0.02, True)
     
   def _addOres(self):
     self._addItems(Items.Iron, 0.0015, False)
@@ -177,10 +179,9 @@ class World:
     for c in self._cells:
       if len(c.items) > 0 :
         for item in c.items:
-          if item.affectedByGravity:
+          if c.passable and item.affectedByGravity:
             cellBelow = self.getCell(c.x, c.y+1)
             if cellBelow and cellBelow.passable:
-              print "Item", item.name, " fell..."
               cellBelow.addItem(item)
               c.removeItem(item)
             
@@ -215,9 +216,9 @@ class World:
       intensity = self.calculateIntensity(player, cell.x, cell.y)
       
       if cell.passable:
-        color = self.c_lightOpen * self.c_torch
+        color = libtcod.color_lerp(self.c_lightOpen, self.c_torch, self.a_torch)
       else:
-        color = self.c_lightWall * self.c_torch
+        color = libtcod.color_lerp(self.c_lightWall, self.c_torch, self.a_torch)
     else:
       intensity = 1
       if not cell.discovered:
