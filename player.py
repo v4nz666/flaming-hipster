@@ -35,12 +35,17 @@ class Player():
     self.min_torchStrength = 1
     self.torchStrength = self.max_torchStrength
     
-    self.torchStep = 1
-    self.torchInterval = 480
+    self.torchStrengthStep = 1
+    self.torchStrengthInterval = 480
     
     
   def update(self):
     self.timer = self.timer + 1
+    
+    if not self.timer % self.torchStrengthInterval:
+      self.torchStrength = self.torchStrength - self.torchStrengthStep
+    
+    
     if not self.timer % self.healthInterval:
       self.health = self.health - self.healthStep
     
