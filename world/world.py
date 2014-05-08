@@ -110,10 +110,11 @@ class World:
     return n
   
   def _addWater(self):
-    self._addItems(Items.Water, 0.02, True)
+    self._addItems(Items.Water, 0.002, True)
     
   def _addOres(self):
     self._addItems(Items.Iron, 0.0015, False)
+    self._addItems(Items.Coal, 0.0025, False)
   
   def _addItems(self, item, prob, passable):
     count = len(self._cells) * prob

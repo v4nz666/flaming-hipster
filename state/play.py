@@ -129,9 +129,10 @@ class Play(State):
     self._gui.frames['Info'].addMessage(str(1 / libtcod.sys_get_last_frame_length()) + "FPS", 1)
     self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 2 )
     self._gui.frames['Info'].addMessage("Health   : " + str(int(self.player.health)), 3 )
-    self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 5 )
-    self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 6 )
-    self._gui.frames['Info'].addMessage("Clipped  : " + str(len(self.player.clippedRopes)), 7 )
+    self._gui.frames['Info'].addMessage("Pick Axe : " + str(self.player.pickAxe), 4 )
+    self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 6 )
+    self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 7 )
+    self._gui.frames['Info'].addMessage("Clipped  : " + str(len(self.player.clippedRopes)), 8 )
 
   ######################################
   ### Key handlers
@@ -140,15 +141,15 @@ class Play(State):
     y = self.player.y - 1;
     cell = self._world.getCell(self.player.x, y)
     if y >= 0 and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvUp()
   
   def mvDn(self) :
     y = self.player.y + 1;
     cell = self._world.getCell(self.player.x, y)
-    if y < self._world.height and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+    if y < self._world.height and (
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvDn()
   
@@ -156,7 +157,7 @@ class Play(State):
     x = self.player.x - 1;
     cell = self._world.getCell(x, self.player.y)
     if x >= 0 and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvLt()
   
@@ -164,7 +165,7 @@ class Play(State):
     x = self.player.x + 1;
     cell = self._world.getCell(x, self.player.y)
     if x < self._world.width and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvRt()
     
@@ -174,7 +175,7 @@ class Play(State):
     x = self.player.x - 1
     cell = self._world.getCell(x, y)
     if y >= 0 and x >= 0 and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvUpLft()
   
@@ -183,7 +184,7 @@ class Play(State):
     x = self.player.x + 1
     cell = self._world.getCell(x, y)
     if y >= 0 and x < self._world.width  and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvUpRgt()
   
@@ -192,7 +193,7 @@ class Play(State):
     x = self.player.x - 1
     cell = self._world.getCell(x, y)
     if y < self._world.height and x >= 0 and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvDnLft()
   
@@ -201,9 +202,13 @@ class Play(State):
     x = self.player.x + 1
     cell = self._world.getCell(x, y)
     if y < self._world.height and x < self._world.width and ( 
-        cell.passable or self._world.dig(cell.x, cell.y, self.player) ):
+        cell.passable or self.dig(cell.x, cell.y) ):
       self.calculateFov = True
       self.player.mvDnRgt()
+  
+  def dig(self, x, y):
+    if self.player.dig():
+      self._world.dig(x, y, self.player)
   
   def ropeToggle(self):
     if self.player.anchored:

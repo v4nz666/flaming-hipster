@@ -14,22 +14,30 @@ class Player():
     self.world = world
     
     self.ropes   = 8
-    self.anchors = 32
+    self.anchors = 128
     self.anchored = False
     self.clippedRopes = []
     
     self.timer = 0
     
     self.max_health = 100
-    self.min_health = -1
+    self.min_health = 0
     self.health = self.max_health
     
     self.healthStep = 1
     self.healthInterval = 60
     
-    self.max_torchStrength = 12
+    self.max_pickAxe = 512
+    self.min_pickAxe = 0
+    self.pickAxe = self.max_pickAxe
+    
+    self.max_torchStrength = 10
     self.min_torchStrength = 1
     self.torchStrength = self.max_torchStrength
+    
+    self.torchStep = 1
+    self.torchInterval = 480
+    
     
   def update(self):
     self.timer = self.timer + 1
@@ -59,23 +67,27 @@ class Player():
           if i.collectedAttribute:
             attr = i.collectedAttribute[0]
             val = i.collectedAttribute[1]
-            self.setAttr(attr, val)
+            self.attrDelta(attr, val)
             
       
-  def setAttr(self, attr, val):
+  def attrDelta(self, attr, delta):
     if hasattr(self, attr):
       
       max = getattr(self, "max_" + attr)
       min = getattr(self, "min_" + attr)
       
       oldVal = getattr(self, attr)
-      newVal = oldVal + val
+      newVal = oldVal + delta
       if newVal > max:
         newVal = max
       elif newVal < min:
         newVal = min
       setattr(self,attr, newVal)
-      
+  
+  def dig(self):
+    self.attrDelta('pickAxe', -1)
+    return self.pickAxe > 0
+  
   def anchoredMove(self, newX, newY):
     
     # Moving to the last-visited tile, remove the current tile from the list, and 

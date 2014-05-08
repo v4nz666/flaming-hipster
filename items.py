@@ -11,8 +11,13 @@ class Items():
     'affectedByGravity': False,
     'collectedAttribute': ['health', 10]
   })
-  Iron = Item('Iron', '+', b'silver')
+  Iron = Item('Iron', '*', b'silver')
   Iron.setOptions({
-    'affectedByGravity': True
+    'affectedByGravity': True,
+    'collectedAttribute': ['pickAxe', 10]
+  })
+  Coal = Item('Coal', '*', b'black')
+  Coal.setOptions({
+    'affectedByGravity': True,
   })
   
