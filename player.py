@@ -38,21 +38,24 @@ class Player():
     self.torchStrengthStep = 1
     self.torchStrengthInterval = 480
     
+    self.calculateFov = True
     
   def update(self):
     self.timer = self.timer + 1
     
     if not self.timer % self.torchStrengthInterval:
-      self.torchStrength = self.torchStrength - self.torchStrengthStep
-    
+      self.attrDelta('torchStrength', - self.torchStrengthStep)
+      self.calculateFov = True
     
     if not self.timer % self.healthInterval:
-      self.health = self.health - self.healthStep
+      self.attrDelta('health', - self.healthStep)
     
     if self.health <= 0:
       return False
     
     return True
+  ### update
+  ##########
   
   def move(self, dx, dy):
     newX = self.x + dx
@@ -74,7 +77,10 @@ class Player():
             val = i.collectedAttribute[1]
             self.attrDelta(attr, val)
             
-      
+    self.calculateFov = True;
+  ### move
+  ########
+  
   def attrDelta(self, attr, delta):
     if hasattr(self, attr):
       
@@ -87,11 +93,16 @@ class Player():
         newVal = max
       elif newVal < min:
         newVal = min
-      setattr(self,attr, newVal)
+      
+      setattr(self, attr, newVal)
+  ### attrDelta
+  #############
   
   def dig(self):
     self.attrDelta('pickAxe', -1)
     return self.pickAxe > 0
+  ### dig
+  #######
   
   def anchoredMove(self, newX, newY):
     

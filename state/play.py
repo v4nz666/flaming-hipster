@@ -67,15 +67,13 @@ class Play(State):
         }
     })
     
-    self.calculateFov = True
-    
     # End: __init__
-  
+
   def beforeTransition(self):
     self.player = player.Player(0,0, self._world)
     self.initGui()
     self.update()
-    self.calculateFov = True
+    
 
   def initGui(self) :
     self._gui = gui.Gui(self.console)
@@ -97,8 +95,8 @@ class Play(State):
   
   def update(self):
     libtcod.console_clear(self.console)
-    if self.calculateFov:
-      self.calculateFov = False
+    if self.player.calculateFov:
+      self.player.calculateFov = False
       libtcod.map_compute_fov(
         self._world.map, self.player.x, self.player.y, self.player.torchStrength, True, libtcod.FOV_SHADOW)
     
@@ -112,7 +110,6 @@ class Play(State):
       if not self.player.anchored:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
         if cellBelow.passable:
-          self.calculateFov = True
           self.player.mvDn()
     except:
       pass
@@ -142,7 +139,6 @@ class Play(State):
     cell = self._world.getCell(self.player.x, y)
     if y >= 0 and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvUp()
   
   def mvDn(self) :
@@ -150,7 +146,6 @@ class Play(State):
     cell = self._world.getCell(self.player.x, y)
     if y < self._world.height and (
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvDn()
   
   def mvLft(self) :
@@ -158,7 +153,6 @@ class Play(State):
     cell = self._world.getCell(x, self.player.y)
     if x >= 0 and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvLt()
   
   def mvRgt(self) :
@@ -166,7 +160,6 @@ class Play(State):
     cell = self._world.getCell(x, self.player.y)
     if x < self._world.width and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvRt()
     
 
@@ -176,7 +169,6 @@ class Play(State):
     cell = self._world.getCell(x, y)
     if y >= 0 and x >= 0 and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvUpLft()
   
   def mvUpRgt(self) :
@@ -185,7 +177,6 @@ class Play(State):
     cell = self._world.getCell(x, y)
     if y >= 0 and x < self._world.width  and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvUpRgt()
   
   def mvDnLft(self) :
@@ -194,7 +185,6 @@ class Play(State):
     cell = self._world.getCell(x, y)
     if y < self._world.height and x >= 0 and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvDnLft()
   
   def mvDnRgt(self) :
@@ -203,7 +193,6 @@ class Play(State):
     cell = self._world.getCell(x, y)
     if y < self._world.height and x < self._world.width and ( 
         cell.passable or self.dig(cell.x, cell.y) ):
-      self.calculateFov = True
       self.player.mvDnRgt()
   
   def dig(self, x, y):
