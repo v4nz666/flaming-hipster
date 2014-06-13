@@ -106,13 +106,24 @@ class Play(State):
     self._world.update()
     self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
     self._world.render(self._gui.frames['Main'], self.player)
-    try:
-      if not self.player.anchored:
+    if not self.player.anchored:
+      try:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
         if cellBelow.passable:
+          if self.player.falling:
+            self.player.fallDistance += 1
+          else :
+            self.player.falling = True
           self.player.mvDn()
-    except:
-      pass
+        
+        else:
+          if self.player.falling:
+            self.player.land()
+        
+          
+      except:
+        pass
+    
     if not self.player.update():
       self.nextState = self._states['death']
 

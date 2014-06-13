@@ -13,6 +13,11 @@ class Player():
     self.y = y
     self.world = world
     
+    self.falling = False
+    self.fallDistance = 0
+    self.fallDamage = 2
+    self.maxFallHeight = 2
+    
     self.ropes   = 8
     self.anchors = 128
     self.anchored = False
@@ -80,6 +85,16 @@ class Player():
     self.calculateFov = True;
   ### move
   ########
+  
+  def land(self):
+    if self.fallDistance > self.maxFallHeight:
+      delta = pow(self.fallDamage, self.fallDistance)
+      print ('Ouch! Fell[', self.fallDistance, '] did [', delta, '] damage')
+      self.attrDelta('health', - delta)
+    
+    self.falling = False
+    self.fallDistance = 0
+    
   
   def attrDelta(self, attr, delta):
     if hasattr(self, attr):
