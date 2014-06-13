@@ -119,10 +119,12 @@ class Play(State):
         else:
           if self.player.falling:
             self.player.land()
-        
-          
       except:
         pass
+    else:
+      if self.player.falling:
+        self.player.falling = False
+        self.player.fallDistance = 0
     
     if not self.player.update():
       self.nextState = self._states['death']
