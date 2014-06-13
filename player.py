@@ -88,7 +88,7 @@ class Player():
   
   def land(self):
     if self.fallDistance > self.maxFallHeight:
-      delta = pow(self.fallDamage, self.fallDistance)
+      delta = pow(self.fallDamage, self.fallDistance - self.maxFallHeight)
       print ('Ouch! Fell[', self.fallDistance, '] did [', delta, '] damage')
       self.attrDelta('health', - delta)
     

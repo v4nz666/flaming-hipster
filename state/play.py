@@ -110,10 +110,10 @@ class Play(State):
       try:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
         if cellBelow.passable:
-          if self.player.falling:
-            self.player.fallDistance += 1
-          else :
+          if not self.player.falling:
             self.player.falling = True
+          
+          self.player.fallDistance += 1
           self.player.mvDn()
         
         else:

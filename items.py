@@ -6,7 +6,7 @@ class Items():
     'collectible': False,
     'affectedByGravity': False
   })
-  Water = Item('Water', '~', b'light_blue')
+  Water = Item('Water', '~', b'dark_blue')
   Water.setOptions({
     'affectedByGravity': False,
     'collectedAttribute': ['health', 10]
