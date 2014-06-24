@@ -15,6 +15,7 @@ class Cell :
     self.passable = False
     self.discovered = False
     self.items = []
+    self.creatures = []
   
   def dig(self) :
     if self.health > 0:
@@ -37,7 +38,14 @@ class Cell :
   
   def removeItem(self, item):
     self.items.remove(item)
-    print "Item removed. Items", self.items
+  
+  def addCreature(self, creature):
+    print "Creature added!"
+    self.creatures.append(creature)
+  
+  def removeCreature(self, creature):
+    self.creatures.remove(creature)
+  
   
   def hasItem(self, item):
     return item in self.items

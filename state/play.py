@@ -7,6 +7,7 @@ import input as input
 import libtcodpy as libtcod
 import gui as gui
 import player as player
+import creature as creature
 
 class Play(State):
   def __init__(self, disp):
@@ -85,6 +86,7 @@ class Play(State):
     self._gui.addFrame(0,0,self._world.width + 1, libtcod.console_get_height(self.console), 'Main')
     self._gui.addFrame(self._world.width + 1,0,infoWidth,infoHeight,'Info')
   
+    
   def setWorld(self, world):
     self._world = world
     self.initFovMap()
@@ -106,6 +108,7 @@ class Play(State):
     self._world.update()
     self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
     self._world.render(self._gui.frames['Main'], self.player)
+    
     if not self.player.anchored:
       try:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
@@ -128,7 +131,13 @@ class Play(State):
     
     if not self.player.update():
       self.nextState = self._states['death']
-
+  
+  def updateEnemies(self):
+    for name in self.enemies:
+      for creature in self.enemies[name]['creatures']:
+        creature.update()
+        pass
+    
   def initFovMap(self):
     for x in range(self._world.width):
       for y in range(self._world.height):

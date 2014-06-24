@@ -2,11 +2,16 @@
 World module
 
 '''
-import cell
-from items import Items
 import random
 import math
 import libtcodpy as libtcod
+import types
+import creature
+import ai
+
+import cell
+import creature
+from items import Items
 
 class World:
   
@@ -14,6 +19,8 @@ class World:
   height = None
   
   _cells = None
+  
+  _creatures = []
   
   c_lightOpen = libtcod.lightest_grey
   c_lightWall = libtcod.light_grey
@@ -31,6 +38,7 @@ class World:
     self._hm = libtcod.heightmap_new(w,h)
     self._cells = []
     self._anchors = []
+    self._spawners = []
     
     self.initMap()
     
@@ -49,6 +57,7 @@ class World:
   def resetMap(self):
     print "Resetting map"
     self.map = libtcod.map_new(self.width, self.height)
+    self._creatures = []
     for y in range(self.height) :
       for x in range(self.width) :
         self._cells[x + y * self.width].reset()
@@ -95,6 +104,7 @@ class World:
               c.empty()
     self._addWater()
     self._addOres()
+    self._addSpawners()
     print "Done."
     return
   
@@ -110,22 +120,93 @@ class World:
     return n
   
   def _addWater(self):
-    self._addItems(Items.Water, 0.002, True)
+    self._addItems(Items.Water, True, 0.002)
     
   def _addOres(self):
-    self._addItems(Items.Iron, 0.0015, False)
-    self._addItems(Items.Coal, 0.0025, False)
+    self._addItems(Items.Iron, False, 0.0015)
+    self._addItems(Items.Coal, False, 0.0025)
   
-  def _addItems(self, item, prob, passable):
-    count = len(self._cells) * prob
+  def _addItems(self, item, passable, prob = None, count = None, minDepth = None, maxDepth = None):
+    if count:
+      count = count
+    elif prob:
+      count = len(self._cells) * prob
+    else:
+      raise Exception("Must supply prob or count")
+    
     cellCount = len(self._cells) - 1
     
     while count > 0 :
       i = random.randint(0, cellCount)
       c = self._cells[i]
       if c.passable == passable and not c.hasItem(item):
+        if minDepth and not c.y >= minDepth:
+          continue
+        if maxDepth and not c.y <= maxDepth:
+          continue
+        
+        if type(item) == types.FunctionType:
+          item = item()
+        
         c.addItem(item)
+        if isinstance(item, creature.Spawner):
+          item.setCoords(c.x, c.y)
         count -= 1
+  
+  def _addSpawners(self):
+    
+    def batSpawner():
+      return creature.Spawner(self, {
+        'species' : 'Bat',
+        'char'    : '^',
+        'color'   : 'black',
+        'health'  : 10,
+        'damage'  : 5,
+        'defense' : 1,
+        'world'   : self,
+        'aiUpdate' : ai.Ai.batAiUpdate
+      })
+    for i in range(10):
+      spawner = batSpawner()
+      self._spawners.append(spawner)
+      self._addItems(
+        spawner,
+        True,
+        None, # prob
+        1,    # count
+        1,    # minDepth
+        50    # maxDepth
+      )
+
+    #def spiderSpawner():
+      #return creature.Spawner(self, {
+        #'species' : 'Cave Spider',
+        #'char'    : 'x',
+        #'color'   : 'black',
+        #'health'  : 15,
+        #'damage'  : 7,
+        #'defense' : 3
+      #})
+    #for i in range(5):
+      #spawner = spiderSpawner()
+      #self._spawners.append(spawner)
+      #self._addItems(
+        #spawner,
+        #True,
+        #None, # prob
+        #1,    # count
+        #20,   # minDepth
+        #int((3 * self.height) / 4)    # maxDepth
+      #)
+  
+  def addCreature(self, c):
+    if not isinstance(c, creature.Creature):
+      raise Exception("Invalid creature")
+    self._creatures.append(c)
+    print "Creature added. Length: " + str(len(self._creatures))
+  
+  def removeCreature(self, c):
+    self._creatures.remove(c)
   
   def getCell(self,x, y) :
     try:
@@ -185,9 +266,10 @@ class World:
             if cellBelow and cellBelow.passable:
               cellBelow.addItem(item)
               c.removeItem(item)
-            
-      
-    
+    for s in self._spawners:
+      s.update()
+    for cr in self._creatures:
+      cr.update()
   
   def render(self, frame, player = False) :
     # Loop over every row inside the frame
@@ -201,13 +283,18 @@ class World:
         
         # If we're in game mode, show the items, and render the player's torch overlay.
         if player:
-          # Render the top item, if there are any here
-          if len(c.items) > 0 and libtcod.map_is_in_fov(self.map, c.x, c.y):
-            item = c.items[len(c.items)-1]
-            frame.putChar(x, y, item.char, item.color)
-          
+          if libtcod.map_is_in_fov(self.map, c.x, c.y):
+            # Render the top item, if there are any here
+            if len(c.items) > 0:
+              item = c.items[len(c.items)-1]
+              frame.putChar(x, y, item.char, item.color)
+            if len(c.creatures) > 0:
+              creature = c.creatures[len(c.items)-1]
+              frame.putChar(x, y, creature.char, creature.color)
+            
+            
           self.renderPlayerOverlay(frame, player, c)
-  
+          
   def renderPlayerOverlay(self, frame, player, cell):
     
     visible = libtcod.map_is_in_fov(self.map, cell.x, cell.y)

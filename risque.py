@@ -44,7 +44,7 @@ Main
 '''
 currentState = s_WorldGen
 while not libtcod.console_is_window_closed() :
-
+  
   disp.render(currentState)
   currentState.inputHandler.handleInput()
   currentState.tick()

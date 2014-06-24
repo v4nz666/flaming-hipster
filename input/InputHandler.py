@@ -4,7 +4,6 @@ class InputHandler():
   
   def initKeyInputs(self,inputs):
     self.inputs = inputs
-    print "Inputs ", self.inputs
   
   def handleInput(self):
     print("Default input handler.")
