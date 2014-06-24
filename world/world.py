@@ -10,7 +10,6 @@ import creature
 import ai
 
 import cell
-import creature
 from items import Items
 
 class World:
