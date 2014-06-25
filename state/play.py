@@ -12,7 +12,7 @@ import creature as creature
 class Play(State):
   def __init__(self, disp):
     State.__init__(self,disp)
-    self.inputHandler = input.NonBlockingKeyboardHandler()
+    self.inputHandler = input.BlockingKeyboardHandler()
     self.inputHandler.initInputs(
       {
         'quit': {
@@ -96,18 +96,6 @@ class Play(State):
     return
   
   def update(self):
-    libtcod.console_clear(self.console)
-    if self.player.calculateFov:
-      self.player.calculateFov = False
-      libtcod.map_compute_fov(
-        self._world.map, self.player.x, self.player.y, self.player.torchStrength, True, libtcod.FOV_SHADOW)
-    
-    self.updateMessages()
-    self._gui.render()
-    
-    self._world.update()
-    self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
-    self._world.render(self._gui.frames['Main'], self.player)
     
     if not self.player.anchored:
       try:
@@ -116,8 +104,21 @@ class Play(State):
           if not self.player.falling:
             self.player.falling = True
           
-          self.player.fallDistance += 1
-          self.player.mvDn()
+          while self.player.falling:
+            if not cellBelow:
+              cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
+              
+            if cellBelow.passable:
+              self.player.fallDistance += 1
+              self.player.mvDn()
+              cellBelow = False
+              
+            else:
+              self.player.land()
+            
+            self.render()
+            self.disp.render(self)
+            
         
         else:
           if self.player.falling:
@@ -129,9 +130,25 @@ class Play(State):
         self.player.falling = False
         self.player.fallDistance = 0
     
+    
     if not self.player.update():
       self.nextState = self._states['death']
+    
+    self.render()
   
+  def render(self):
+    if self.player.calculateFov:
+      self.player.calculateFov = False
+      libtcod.map_compute_fov(
+        self._world.map, self.player.x, self.player.y, self.player.torchStrength, True, libtcod.FOV_SHADOW)
+    
+    libtcod.console_clear(self.console)
+    self.updateMessages()
+    self._gui.render()
+    self._world.update()
+    self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
+    self._world.render(self._gui.frames['Main'], self.player)
+    
   def updateEnemies(self):
     for name in self.enemies:
       for creature in self.enemies[name]['creatures']:
@@ -145,13 +162,12 @@ class Play(State):
         libtcod.map_set_properties(self._world.map, x, y, c.passable, c.passable)
   
   def updateMessages(self) :
-    self._gui.frames['Info'].addMessage(str(1 / libtcod.sys_get_last_frame_length()) + "FPS", 1)
-    self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 2 )
-    self._gui.frames['Info'].addMessage("Health   : " + str(int(self.player.health)), 3 )
-    self._gui.frames['Info'].addMessage("Pick Axe : " + str(self.player.pickAxe), 4 )
-    self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 6 )
-    self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 7 )
-    self._gui.frames['Info'].addMessage("Clipped  : " + str(len(self.player.clippedRopes)), 8 )
+    self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 1 )
+    self._gui.frames['Info'].addMessage("Health   : " + str(int(self.player.health)), 2 )
+    self._gui.frames['Info'].addMessage("Pick Axe : " + str(self.player.pickAxe), 3 )
+    self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 5 )
+    self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 6 )
+    self._gui.frames['Info'].addMessage("Clipped  : " + str(len(self.player.clippedRopes)), 7 )
 
   ######################################
   ### Key handlers

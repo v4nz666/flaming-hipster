@@ -288,7 +288,7 @@ class World:
               item = c.items[len(c.items)-1]
               frame.putChar(x, y, item.char, item.color)
             if len(c.creatures) > 0:
-              creature = c.creatures[len(c.items)-1]
+              creature = c.creatures[len(c.creatures)-1]
               frame.putChar(x, y, creature.char, creature.color)
             
             
