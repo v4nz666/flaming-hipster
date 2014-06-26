@@ -36,9 +36,6 @@ class World:
     
     self._hm = libtcod.heightmap_new(w,h)
     self._cells = []
-    self._anchors = []
-    self._spawners = []
-    
     self.initMap()
     
     return
@@ -56,6 +53,7 @@ class World:
   def resetMap(self):
     print "Resetting map"
     self.map = libtcod.map_new(self.width, self.height)
+    self._spawners = []
     self._creatures = []
     for y in range(self.height) :
       for x in range(self.width) :
@@ -163,14 +161,15 @@ class World:
         'damage'  : 5,
         'defense' : 1,
         'world'   : self,
-        'aiUpdate' : ai.Ai.batAiUpdate
+        'aiUpdate' : 'batAiUpdate'
       })
     for i in range(10):
+      
       spawner = batSpawner()
       self._spawners.append(spawner)
       self._addItems(
         spawner,
-        True,
+        True, # passable
         None, # prob
         1,    # count
         1,    # minDepth
@@ -256,7 +255,7 @@ class World:
     else:
       self.yOffset = y - frame.innerHeight / 2
   
-  def update(self):
+  def update(self, player, updateEnemies = True):
     for c in self._cells:
       if len(c.items) > 0 :
         for item in c.items:
@@ -265,10 +264,11 @@ class World:
             if cellBelow and cellBelow.passable:
               cellBelow.addItem(item)
               c.removeItem(item)
-    for s in self._spawners:
-      s.update()
-    for cr in self._creatures:
-      cr.update()
+    if updateEnemies:
+      for s in self._spawners:
+        s.update()
+      for cr in self._creatures:
+        cr.update(player)
   
   def render(self, frame, player = False) :
     # Loop over every row inside the frame

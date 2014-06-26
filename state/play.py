@@ -115,8 +115,9 @@ class Play(State):
               
             else:
               self.player.land()
-            
-            self.render()
+              
+            #don't update enemies while falling
+            self.render(False)
             self.disp.render(self)
             
         
@@ -136,7 +137,7 @@ class Play(State):
     
     self.render()
   
-  def render(self):
+  def render(self, updateEnemies = True):
     if self.player.calculateFov:
       self.player.calculateFov = False
       libtcod.map_compute_fov(
@@ -145,7 +146,7 @@ class Play(State):
     libtcod.console_clear(self.console)
     self.updateMessages()
     self._gui.render()
-    self._world.update()
+    self._world.update(self.player, updateEnemies)
     self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
     self._world.render(self._gui.frames['Main'], self.player)
     
