@@ -159,7 +159,7 @@ class Play(State):
     self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
     self._world.render(self._gui.frames['Main'], self.player)
     
-def initFovMap(self):
+  def initFovMap(self):
     for x in range(self._world.width):
       for y in range(self._world.height):
         c = self._world.getCell(x,y)
