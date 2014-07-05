@@ -12,7 +12,7 @@ import creature as creature
 class Play(State):
   def __init__(self, disp):
     State.__init__(self,disp)
-    self.inputHandler = input.BlockingKeyboardHandler()
+    self.inputHandler = input.NonBlockingKeyboardHandler()
     self.inputHandler.initInputs(
       {
         'quit': {
@@ -68,12 +68,14 @@ class Play(State):
         }
     })
     
+    #libtcod.sys_set_fps(4)
+    
     # End: __init__
 
   def beforeTransition(self):
     self.player = player.Player(0,0, self._world)
     self.initGui()
-    self.update()
+    self.turnUpdate()
     
 
   def initGui(self) :
@@ -92,11 +94,20 @@ class Play(State):
     self.initFovMap()
   
   def tick(self):
-    self.update()
+    if self.inputHandler.gotInput:
+      self.turnUpdate()
+      self._world.update(self.player)
+      self.render()
+    else:
+      pass
+    #self.update()
     return
   
-  def update(self):
+  def tickUpdate(self):
+    pass
     
+  
+  def turnUpdate(self):
     if not self.player.anchored:
       try:
         cellBelow = self._world.getCell(self.player.x, self.player.y + 1)
@@ -117,7 +128,8 @@ class Play(State):
               self.player.land()
               
             #don't update enemies while falling
-            self.render(False)
+            self._world.update(self.player, False)
+            self.render()
             self.disp.render(self)
             
         
@@ -134,10 +146,8 @@ class Play(State):
     
     if not self.player.update():
       self.nextState = self._states['death']
-    
-    self.render()
   
-  def render(self, updateEnemies = True):
+  def render(self):
     if self.player.calculateFov:
       self.player.calculateFov = False
       libtcod.map_compute_fov(
@@ -146,17 +156,10 @@ class Play(State):
     libtcod.console_clear(self.console)
     self.updateMessages()
     self._gui.render()
-    self._world.update(self.player, updateEnemies)
     self._world.calculateOffset(self.player.y, self._gui.frames['Main'])
     self._world.render(self._gui.frames['Main'], self.player)
     
-  def updateEnemies(self):
-    for name in self.enemies:
-      for creature in self.enemies[name]['creatures']:
-        creature.update()
-        pass
-    
-  def initFovMap(self):
+def initFovMap(self):
     for x in range(self._world.width):
       for y in range(self._world.height):
         c = self._world.getCell(x,y)
@@ -166,9 +169,11 @@ class Play(State):
     self._gui.frames['Info'].addMessage("Position : " + str((self.player.x, self.player.y)), 1 )
     self._gui.frames['Info'].addMessage("Health   : " + str(int(self.player.health)), 2 )
     self._gui.frames['Info'].addMessage("Pick Axe : " + str(self.player.pickAxe), 3 )
+    self._gui.frames['Info'].addMessage("Torch    : " + str(self.player.torchStrength), 4 )
     self._gui.frames['Info'].addMessage("Anchors  : " + str(self.player.anchors), 5 )
     self._gui.frames['Info'].addMessage("Ropes    : " + str(self.player.ropes), 6 )
     self._gui.frames['Info'].addMessage("Clipped  : " + str(len(self.player.clippedRopes)), 7 )
+    self._gui.frames['Info'].addMessage("FPS      : " + str(libtcod.sys_get_fps()), 8 )
 
   ######################################
   ### Key handlers
@@ -176,63 +181,87 @@ class Play(State):
   def mvUp(self) :
     y = self.player.y - 1;
     cell = self._world.getCell(self.player.x, y)
-    if y >= 0 and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvUp()
+    if y >= 0:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvUp()
   
   def mvDn(self) :
     y = self.player.y + 1;
     cell = self._world.getCell(self.player.x, y)
-    if y < self._world.height and (
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvDn()
+    if y < self._world.height:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvDn()
   
   def mvLft(self) :
     x = self.player.x - 1;
     cell = self._world.getCell(x, self.player.y)
-    if x >= 0 and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvLt()
+    if x >= 0:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvLt()
   
   def mvRgt(self) :
     x = self.player.x + 1;
     cell = self._world.getCell(x, self.player.y)
-    if x < self._world.width and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvRt()
+    if x < self._world.width:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvRt()
     
 
   def mvUpLft(self) :
     y = self.player.y - 1
     x = self.player.x - 1
     cell = self._world.getCell(x, y)
-    if y >= 0 and x >= 0 and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvUpLft()
+    if y >= 0 and x >= 0:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvUpLft()
   
   def mvUpRgt(self) :
     y = self.player.y - 1
     x = self.player.x + 1
     cell = self._world.getCell(x, y)
-    if y >= 0 and x < self._world.width  and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvUpRgt()
+    if y >= 0 and x < self._world.width:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvUpRgt()
   
   def mvDnLft(self) :
     y = self.player.y + 1
     x = self.player.x - 1
     cell = self._world.getCell(x, y)
-    if y < self._world.height and x >= 0 and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvDnLft()
+    if y < self._world.height:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvDnLft()
   
   def mvDnRgt(self) :
     y = self.player.y + 1
     x = self.player.x + 1
     cell = self._world.getCell(x, y)
-    if y < self._world.height and x < self._world.width and ( 
-        cell.passable or self.dig(cell.x, cell.y) ):
-      self.player.mvDnRgt()
+    if y < self._world.height and x < self._world.width:
+      if len(cell.creatures) > 0:
+        self.player.attackCreature(cell.creatures[0])
+      
+      elif cell.passable or self.dig(cell.x, cell.y):
+        self.player.mvDnRgt()
   
   def dig(self, x, y):
     if self.player.dig():

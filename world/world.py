@@ -158,7 +158,7 @@ class World:
         'char'    : '^',
         'color'   : 'black',
         'health'  : 10,
-        'damage'  : 5,
+        'attack'  : 5,
         'defense' : 1,
         'world'   : self,
         'aiUpdate' : 'batAiUpdate'
@@ -182,7 +182,7 @@ class World:
         #'char'    : 'x',
         #'color'   : 'black',
         #'health'  : 15,
-        #'damage'  : 7,
+        #'attack'  : 7,
         #'defense' : 3
       #})
     #for i in range(5):

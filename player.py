@@ -5,8 +5,11 @@ Display
 import libtcodpy as libtcod
 import math
 from items import Items
+import creature
+import ai
 
-class Player():
+#TODO: Move a lot of stuff to creature.Creature
+class Player(creature.Creature):
   
   def __init__(self, x, y, world) :
     self.x = x
@@ -41,11 +44,28 @@ class Player():
     self.torchStrength = self.max_torchStrength
     
     self.torchStrengthStep = 1
-    self.torchStrengthInterval = 480
+    self.torchStrengthInterval = 60
     
     self.calculateFov = True
+    self.ai = ai.Ai(self, self.world)
+    
+    options =     {
+      'species' : 'Player',
+      'health'  : self.health,
+      'attack'  : 10,
+      'defense' : 5,
+      'char'    : '@',
+      'color'   : libtcod.white,
+      'world'   : self.world,
+      'aiUpdate': 'aiUpdate'
+    }
+
+    creature.Creature.__init__(self, options)
     
   def update(self):
+    if self.health <= 0:
+      return False
+    
     self.timer = self.timer + 1
     
     if not self.timer % self.torchStrengthInterval:
@@ -55,12 +75,13 @@ class Player():
     if not self.timer % self.healthInterval:
       self.attrDelta('health', - self.healthStep)
     
-    if self.health <= 0:
-      return False
     
     return True
   ### update
   ##########
+  
+  def die(self):
+    self.health = 0
   
   def move(self, dx, dy):
     newX = self.x + dx
@@ -95,24 +116,8 @@ class Player():
     self.falling = False
     self.fallDistance = 0
     
-  
-  def attrDelta(self, attr, delta):
-    if hasattr(self, attr):
-      
-      max = getattr(self, "max_" + attr)
-      min = getattr(self, "min_" + attr)
-      
-      oldVal = getattr(self, attr)
-      newVal = oldVal + delta
-      if newVal > max:
-        newVal = max
-      elif newVal < min:
-        newVal = min
-      
-      setattr(self, attr, newVal)
-  ### attrDelta
-  #############
-  
+    if self.health == 0:
+      self.die()
   def dig(self):
     self.attrDelta('pickAxe', -1)
     return self.pickAxe > 0
@@ -148,7 +153,6 @@ class Player():
     
     # No ropes left, but there's ground to jump to.
     elif not self.world.passable(newX, newY + 1):
-      print "No looking back!"
       self.detach()
         
     # No ropes left, and no solid ground to jump  to, cant go that way
